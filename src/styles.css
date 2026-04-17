@@ -45,43 +45,43 @@
 :root {
   --radius: 0.5rem;
 
-  /* Corporate slate + navy ERP palette */
-  --background: oklch(0.985 0.003 247);
-  --foreground: oklch(0.21 0.04 256);
+  /* Diprolam Bjx palette: cyan #00B5E2 + gris #58595B */
+  --background: oklch(0.985 0.003 230);
+  --foreground: oklch(0.28 0.01 240);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.04 256);
+  --card-foreground: oklch(0.28 0.01 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.04 256);
+  --popover-foreground: oklch(0.28 0.01 240);
 
-  --primary: oklch(0.38 0.11 258);          /* navy 700 */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.01 247);
-  --secondary-foreground: oklch(0.28 0.05 258);
-  --muted: oklch(0.965 0.008 247);
-  --muted-foreground: oklch(0.5 0.03 257);
-  --accent: oklch(0.94 0.02 247);
-  --accent-foreground: oklch(0.28 0.05 258);
+  --primary: oklch(0.72 0.13 220);          /* Diprolam cyan #00B5E2 */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.005 240);
+  --secondary-foreground: oklch(0.32 0.01 240);
+  --muted: oklch(0.965 0.005 240);
+  --muted-foreground: oklch(0.5 0.01 240);
+  --accent: oklch(0.93 0.025 220);
+  --accent-foreground: oklch(0.32 0.01 240);
 
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
   --success: oklch(0.62 0.14 152);
   --success-foreground: oklch(0.99 0 0);
   --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.21 0.04 256);
-  --info: oklch(0.62 0.14 235);
-  --info-foreground: oklch(0.99 0 0);
+  --warning-foreground: oklch(0.28 0.05 60);
+  --info: oklch(0.72 0.13 220);
+  --info-foreground: oklch(1 0 0);
 
-  --border: oklch(0.91 0.01 256);
-  --input: oklch(0.91 0.01 256);
-  --ring: oklch(0.45 0.13 258);
+  --border: oklch(0.91 0.005 240);
+  --input: oklch(0.91 0.005 240);
+  --ring: oklch(0.72 0.13 220);
 
-  /* Sidebar (dark navy) */
-  --sidebar: oklch(0.23 0.05 258);
-  --sidebar-foreground: oklch(0.92 0.01 247);
-  --sidebar-accent: oklch(0.42 0.13 258);
-  --sidebar-accent-foreground: oklch(0.99 0 0);
-  --sidebar-border: oklch(0.3 0.05 258);
-  --sidebar-hover: oklch(0.3 0.06 258);
+  /* Sidebar: gris corporativo Diprolam #58595B */
+  --sidebar: oklch(0.42 0.005 250);
+  --sidebar-foreground: oklch(0.96 0.005 240);
+  --sidebar-accent: oklch(0.72 0.13 220);    /* cyan accent */
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.5 0.005 250);
+  --sidebar-hover: oklch(0.5 0.005 250);
 
   --sidebar-width: 260px;
   --header-height: 60px;

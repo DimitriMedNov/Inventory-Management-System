@@ -245,9 +245,13 @@ function Inner() {
                 </table>
               </div>
 
-              {((role === "admin" && detail.estatus === "pendiente") ||
-                (role === "almacen" && detail.estatus === "aprobada") ||
-                (role === "solicitante" && detail.estatus === "pendiente" && detail.usuario_id === user?.id)) && (
+              {role !== "solicitante" && detail.estatus !== "cancelada" && (
+                <div className="mb-3">
+                  <Label>Comentario {detail.estatus === "pendiente" ? "(autorización)" : detail.estatus === "aprobada" ? "(entrega)" : ""}</Label>
+                  <Textarea rows={2} value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Notas internas para esta solicitud..." />
+                </div>
+              )}
+              {role === "solicitante" && detail.estatus === "pendiente" && detail.usuario_id === user?.id && (
                 <div className="mb-3">
                   <Label>Comentario</Label>
                   <Textarea rows={2} value={comentario} onChange={(e) => setComentario(e.target.value)} />
@@ -255,13 +259,13 @@ function Inner() {
               )}
 
               <DialogFooter className="flex flex-wrap gap-2">
-                {role === "admin" && detail.estatus === "pendiente" && (
+                {(role === "admin" || role === "almacen") && detail.estatus === "pendiente" && (
                   <>
                     <Button variant="outline" onClick={rechazar}><XCircle className="h-4 w-4 mr-1" /> Rechazar</Button>
                     <Button onClick={aprobar}><CheckCircle2 className="h-4 w-4 mr-1" /> Aprobar</Button>
                   </>
                 )}
-                {role === "almacen" && detail.estatus === "aprobada" && (
+                {(role === "admin" || role === "almacen") && detail.estatus === "aprobada" && (
                   <Button onClick={entregar}><Truck className="h-4 w-4 mr-1" /> Marcar como entregada</Button>
                 )}
                 {role === "solicitante" && detail.estatus === "pendiente" && detail.usuario_id === user?.id && (
