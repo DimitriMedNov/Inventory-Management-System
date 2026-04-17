@@ -122,6 +122,11 @@ function Inner() {
       <PageHeader
         title="Gestión de usuarios"
         description="Administra los miembros del sistema, sus roles y el estado de sus cuentas."
+        actions={
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" /> Nuevo usuario
+          </Button>
+        }
       />
 
       <div className="rounded-lg border border-border bg-card">
