@@ -45,6 +45,7 @@ function Inner() {
   const [carrito, setCarrito] = useState<Linea[]>([]);
   const [open, setOpen] = useState(false);
   const [comentario, setComentario] = useState("");
+  const [fechaRequerida, setFechaRequerida] = useState("");
 
   const load = useCallback(async () => {
     const [{ data: p }, { data: c }] = await Promise.all([
@@ -78,7 +79,11 @@ function Inner() {
     try {
       const { data: sol, error: e1 } = await supabase
         .from("solicitudes")
-        .insert({ usuario_id: user.id, comentarios_usuario: comentario || null })
+        .insert({
+          usuario_id: user.id,
+          comentarios_usuario: comentario || null,
+          fecha_requerida: fechaRequerida ? new Date(fechaRequerida).toISOString() : null,
+        })
         .select().single();
       if (e1) throw e1;
       const detalles = carrito.map((l) => ({
@@ -89,7 +94,7 @@ function Inner() {
       const { error: e2 } = await supabase.from("detalle_solicitud").insert(detalles);
       if (e2) throw e2;
       toast.success(`Solicitud #${sol.folio} enviada`);
-      setCarrito([]); setComentario(""); setOpen(false);
+      setCarrito([]); setComentario(""); setFechaRequerida(""); setOpen(false);
       nav({ to: "/solicitudes" });
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Error");
@@ -189,9 +194,21 @@ function Inner() {
               </tbody>
             </table>
           </div>
-          <div>
-            <Label>Motivo o comentario</Label>
-            <Textarea rows={2} value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Para qué se usará, urgencia, etc." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label>Fecha requerida</Label>
+              <Input
+                type="date"
+                value={fechaRequerida}
+                min={new Date().toISOString().split("T")[0]}
+                onChange={(e) => setFechaRequerida(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">¿Para cuándo la necesitas?</p>
+            </div>
+            <div>
+              <Label>Motivo o comentario</Label>
+              <Textarea rows={2} value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Para qué se usará, urgencia, etc." />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Seguir agregando</Button>

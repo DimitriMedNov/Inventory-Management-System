@@ -238,9 +238,13 @@ export type Database = {
           estatus: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion: string | null
           fecha_entrega: string | null
+          fecha_lista: string | null
+          fecha_requerida: string | null
           fecha_solicitud: string
           folio: number
           id: string
+          preparado_por: string | null
+          recibido_por: string | null
           updated_at: string
           usuario_id: string
         }
@@ -254,9 +258,13 @@ export type Database = {
           estatus?: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion?: string | null
           fecha_entrega?: string | null
+          fecha_lista?: string | null
+          fecha_requerida?: string | null
           fecha_solicitud?: string
           folio?: number
           id?: string
+          preparado_por?: string | null
+          recibido_por?: string | null
           updated_at?: string
           usuario_id: string
         }
@@ -270,9 +278,13 @@ export type Database = {
           estatus?: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion?: string | null
           fecha_entrega?: string | null
+          fecha_lista?: string | null
+          fecha_requerida?: string | null
           fecha_solicitud?: string
           folio?: number
           id?: string
+          preparado_por?: string | null
+          recibido_por?: string | null
           updated_at?: string
           usuario_id?: string
         }
@@ -325,6 +337,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      confirmar_recepcion_solicitud: {
+        Args: { _comentarios?: string; _solicitud_id: string }
+        Returns: {
+          autorizado_por: string | null
+          comentarios_admin: string | null
+          comentarios_almacen: string | null
+          comentarios_usuario: string | null
+          created_at: string
+          entregado_por: string | null
+          estatus: Database["public"]["Enums"]["solicitud_estatus"]
+          fecha_autorizacion: string | null
+          fecha_entrega: string | null
+          fecha_lista: string | null
+          fecha_requerida: string | null
+          fecha_solicitud: string
+          folio: number
+          id: string
+          preparado_por: string | null
+          recibido_por: string | null
+          updated_at: string
+          usuario_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "solicitudes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       entregar_solicitud: {
         Args: { _comentarios?: string; _entregas: Json; _solicitud_id: string }
         Returns: {
@@ -337,9 +378,13 @@ export type Database = {
           estatus: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion: string | null
           fecha_entrega: string | null
+          fecha_lista: string | null
+          fecha_requerida: string | null
           fecha_solicitud: string
           folio: number
           id: string
+          preparado_por: string | null
+          recibido_por: string | null
           updated_at: string
           usuario_id: string
         }
@@ -361,6 +406,35 @@ export type Database = {
         }
         Returns: boolean
       }
+      marcar_lista_solicitud: {
+        Args: { _comentarios?: string; _entregas: Json; _solicitud_id: string }
+        Returns: {
+          autorizado_por: string | null
+          comentarios_admin: string | null
+          comentarios_almacen: string | null
+          comentarios_usuario: string | null
+          created_at: string
+          entregado_por: string | null
+          estatus: Database["public"]["Enums"]["solicitud_estatus"]
+          fecha_autorizacion: string | null
+          fecha_entrega: string | null
+          fecha_lista: string | null
+          fecha_requerida: string | null
+          fecha_solicitud: string
+          folio: number
+          id: string
+          preparado_por: string | null
+          recibido_por: string | null
+          updated_at: string
+          usuario_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "solicitudes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_user_activo: {
         Args: { _activo: boolean; _user_id: string }
         Returns: undefined
@@ -381,6 +455,7 @@ export type Database = {
         | "aprobada"
         | "rechazada"
         | "cancelada"
+        | "lista"
         | "entregada"
     }
     CompositeTypes: {
@@ -516,6 +591,7 @@ export const Constants = {
         "aprobada",
         "rechazada",
         "cancelada",
+        "lista",
         "entregada",
       ],
     },
