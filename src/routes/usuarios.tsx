@@ -233,9 +233,17 @@ function Inner() {
         onOpenChange={setCreateOpen}
         onCreate={async (form) => {
           try {
-            const res = await createUserFn({ data: form });
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+              toast.error("Sesión expirada. Inicia sesión de nuevo.");
+              return false;
+            }
+            const res = await createUserFn({
+              data: form,
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
             if (!res.ok) {
-              toast.error(res.error);
+              toast.error(res.error || "No se pudo crear el usuario");
               return false;
             }
             toast.success("Usuario creado");
@@ -243,7 +251,9 @@ function Inner() {
             await load();
             return true;
           } catch (e: unknown) {
-            toast.error(e instanceof Error ? e.message : "Error al crear usuario");
+            const msg = e instanceof Error ? e.message : "Error al crear usuario";
+            toast.error(msg);
+            console.error("createUser error:", e);
             return false;
           }
         }}
