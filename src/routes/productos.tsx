@@ -71,12 +71,15 @@ function Inner() {
 
   const onSave = async (form: Partial<Producto>) => {
     try {
+      // strip joined relations before sending
+      const { categorias: _c, ubicaciones: _u, id: _id, ...payload } = form as Producto;
+      void _c; void _u; void _id;
       if (editing) {
-        const { error } = await supabase.from("productos").update(form).eq("id", editing.id);
+        const { error } = await supabase.from("productos").update(payload).eq("id", editing.id);
         if (error) throw error;
         toast.success("Producto actualizado");
       } else {
-        const { error } = await supabase.from("productos").insert({ ...form, creado_por: user?.id } as never);
+        const { error } = await supabase.from("productos").insert({ ...(payload as Omit<Producto, "id" | "categorias" | "ubicaciones">), creado_por: user?.id });
         if (error) throw error;
         toast.success("Producto creado");
       }
