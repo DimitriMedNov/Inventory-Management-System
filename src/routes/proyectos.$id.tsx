@@ -78,7 +78,7 @@ function Inner() {
     if (ids.length > 0) {
       const { data: profs } = await supabase
         .from("profiles").select("id, nombre, area").in("id", ids);
-      profMap = Object.fromEntries((profs ?? []).map((p) => [p.id, { nombre: p.nombre, area: p.area }]));
+      profMap = Object.fromEntries((profs ?? []).map((pr) => [pr.id, { nombre: pr.nombre, area: pr.area }]));
     }
     setSols(rows.map((r) => ({ ...r, profiles: profMap[r.usuario_id] ?? null })));
   }, [id]);
@@ -92,10 +92,10 @@ function Inner() {
     acc + s.detalle_solicitud.reduce((a, d) => a + Number(d.cantidad_entregada || 0), 0), 0);
 
   if (!proyecto) {
-    return (
-      <div className="text-sm text-muted-foreground">Cargando proyecto…</div>
-    );
+    return <div className="text-sm text-muted-foreground">Cargando proyecto…</div>;
   }
+
+  const toggle = (sid: string) => setExpanded((e) => ({ ...e, [sid]: !e[sid] }));
 
   return (
     <>
@@ -138,71 +138,9 @@ function Inner() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {sols.map((s) => {
-                const open = !!expanded[s.id];
-                const items = s.detalle_solicitud.length;
-                return (
-                  <FragmentRow key={s.id} s={s} open={open} onToggle={() => setExpanded((e) => ({ ...e, [s.id]: !open }))} />
-                );
-                        <div className="font-medium">{s.profiles?.nombre ?? "—"}</div>
-                        {s.profiles?.area && <div className="text-xs text-muted-foreground">{s.profiles.area}</div>}
-                      </td>
-                      <td className="px-4 py-3"><StatusBadge status={s.estatus} /></td>
-                      <td className="px-4 py-3 text-muted-foreground">{fmtDateTime(s.fecha_solicitud)}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{fmtDateTime(s.fecha_entrega)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{items}</td>
-                      <td className="px-4 py-3 text-right">
-                        <Button size="sm" variant="ghost"
-                          onClick={() => setExpanded((e) => ({ ...e, [s.id]: !open }))}>
-                          {open ? "Ocultar" : "Ver"}
-                        </Button>
-                      </td>
-                    </tr>
-                    {open && (
-                      <tr key={s.id + "-d"} className="bg-muted/20">
-                        <td colSpan={7} className="px-4 py-4">
-                          <div className="grid md:grid-cols-2 gap-4 mb-3 text-xs">
-                            <Info label="Solicitada" value={fmtDateTime(s.fecha_solicitud)} />
-                            <Info label="Requerida" value={fmtDateTime(s.fecha_requerida)} />
-                            <Info label="Autorizada" value={fmtDateTime(s.fecha_autorizacion)} />
-                            <Info label="Lista" value={fmtDateTime(s.fecha_lista)} />
-                            <Info label="Entregada" value={fmtDateTime(s.fecha_entrega)} />
-                            {s.comentarios_usuario && (
-                              <Info label="Comentarios" value={s.comentarios_usuario} />
-                            )}
-                          </div>
-                          <div className="rounded-md border border-border bg-card overflow-hidden">
-                            <table className="w-full text-xs">
-                              <thead className="bg-muted/40 text-muted-foreground">
-                                <tr className="text-left">
-                                  <th className="px-3 py-2 font-medium">SKU</th>
-                                  <th className="px-3 py-2 font-medium">Producto</th>
-                                  <th className="px-3 py-2 font-medium text-right">Solicitado</th>
-                                  <th className="px-3 py-2 font-medium text-right">Entregado</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-border">
-                                {s.detalle_solicitud.map((d) => (
-                                  <tr key={d.id}>
-                                    <td className="px-3 py-2 font-mono">{d.productos?.sku ?? "—"}</td>
-                                    <td className="px-3 py-2">{d.productos?.nombre ?? "—"}</td>
-                                    <td className="px-3 py-2 text-right tabular-nums">
-                                      {Number(d.cantidad_solicitada)} {d.productos?.unidad_medida ?? ""}
-                                    </td>
-                                    <td className="px-3 py-2 text-right tabular-nums">
-                                      {Number(d.cantidad_entregada)} {d.productos?.unidad_medida ?? ""}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                );
-              })}
+              {sols.map((s) => (
+                <SolRow key={s.id} s={s} open={!!expanded[s.id]} onToggle={() => toggle(s.id)} />
+              ))}
               {sols.length === 0 && (
                 <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-sm">
                   Este proyecto aún no tiene solicitudes.
@@ -212,6 +150,70 @@ function Inner() {
           </table>
         </div>
       </div>
+    </>
+  );
+}
+
+function SolRow({ s, open, onToggle }: { s: Sol; open: boolean; onToggle: () => void }) {
+  const items = s.detalle_solicitud.length;
+  return (
+    <>
+      <tr className="hover:bg-muted/30">
+        <td className="px-4 py-3 font-mono">#{s.folio}</td>
+        <td className="px-4 py-3">
+          <div className="font-medium">{s.profiles?.nombre ?? "—"}</div>
+          {s.profiles?.area && <div className="text-xs text-muted-foreground">{s.profiles.area}</div>}
+        </td>
+        <td className="px-4 py-3"><StatusBadge status={s.estatus} /></td>
+        <td className="px-4 py-3 text-muted-foreground">{fmtDateTime(s.fecha_solicitud)}</td>
+        <td className="px-4 py-3 text-muted-foreground">{fmtDateTime(s.fecha_entrega)}</td>
+        <td className="px-4 py-3 text-right tabular-nums">{items}</td>
+        <td className="px-4 py-3 text-right">
+          <Button size="sm" variant="ghost" onClick={onToggle}>
+            {open ? "Ocultar" : "Ver"}
+          </Button>
+        </td>
+      </tr>
+      {open && (
+        <tr className="bg-muted/20">
+          <td colSpan={7} className="px-4 py-4">
+            <div className="grid md:grid-cols-3 gap-4 mb-3 text-xs">
+              <Info label="Solicitada" value={fmtDateTime(s.fecha_solicitud)} />
+              <Info label="Requerida" value={fmtDateTime(s.fecha_requerida)} />
+              <Info label="Autorizada" value={fmtDateTime(s.fecha_autorizacion)} />
+              <Info label="Lista" value={fmtDateTime(s.fecha_lista)} />
+              <Info label="Entregada" value={fmtDateTime(s.fecha_entrega)} />
+              {s.comentarios_usuario && <Info label="Comentarios" value={s.comentarios_usuario} />}
+            </div>
+            <div className="rounded-md border border-border bg-card overflow-hidden">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/40 text-muted-foreground">
+                  <tr className="text-left">
+                    <th className="px-3 py-2 font-medium">SKU</th>
+                    <th className="px-3 py-2 font-medium">Producto</th>
+                    <th className="px-3 py-2 font-medium text-right">Solicitado</th>
+                    <th className="px-3 py-2 font-medium text-right">Entregado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {s.detalle_solicitud.map((d) => (
+                    <tr key={d.id}>
+                      <td className="px-3 py-2 font-mono">{d.productos?.sku ?? "—"}</td>
+                      <td className="px-3 py-2">{d.productos?.nombre ?? "—"}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">
+                        {Number(d.cantidad_solicitada)} {d.productos?.unidad_medida ?? ""}
+                      </td>
+                      <td className="px-3 py-2 text-right tabular-nums">
+                        {Number(d.cantidad_entregada)} {d.productos?.unidad_medida ?? ""}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+      )}
     </>
   );
 }
