@@ -194,7 +194,7 @@ function Inner() {
             <Textarea rows={2} value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Para qué se usará, urgencia, etc." />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Seguir comprando</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>Seguir agregando</Button>
             <Button onClick={enviar} disabled={carrito.some((l) => l.cantidad <= 0 || l.cantidad > l.producto.stock_actual)}>
               Enviar solicitud
             </Button>
