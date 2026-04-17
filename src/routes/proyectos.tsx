@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { PageHeader } from "@/components/PageHeader";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, Briefcase, CheckCircle2, XCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Briefcase, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/proyectos")({
@@ -175,6 +175,11 @@ function Inner() {
                     <td className="px-4 py-3 text-right tabular-nums">{count}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
+                        <Button size="sm" variant="ghost" asChild title="Ver historial">
+                          <Link to="/proyectos/$id" params={{ id: p.id }}>
+                            <Eye className="h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
                         <Button size="sm" variant="ghost" onClick={() => toggleActivo(p)}
                           title={p.activo ? "Marcar como terminado" : "Reactivar"}>
                           {p.activo ? <XCircle className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
