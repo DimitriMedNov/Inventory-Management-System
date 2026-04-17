@@ -9,14 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as UbicacionesRouteImport } from './routes/ubicaciones'
 import { Route as SolicitudesRouteImport } from './routes/solicitudes'
 import { Route as ProductosRouteImport } from './routes/productos'
 import { Route as MovimientosRouteImport } from './routes/movimientos'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
 
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UbicacionesRoute = UbicacionesRouteImport.update({
+  id: '/ubicaciones',
+  path: '/ubicaciones',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SolicitudesRoute = SolicitudesRouteImport.update({
   id: '/solicitudes',
   path: '/solicitudes',
@@ -42,6 +55,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriasRoute = CategoriasRouteImport.update({
+  id: '/categorias',
+  path: '/categorias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
@@ -56,73 +74,108 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
+  '/categorias': typeof CategoriasRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
   '/solicitudes': typeof SolicitudesRoute
+  '/ubicaciones': typeof UbicacionesRoute
+  '/usuarios': typeof UsuariosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
+  '/categorias': typeof CategoriasRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
   '/solicitudes': typeof SolicitudesRoute
+  '/ubicaciones': typeof UbicacionesRoute
+  '/usuarios': typeof UsuariosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
+  '/categorias': typeof CategoriasRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
   '/solicitudes': typeof SolicitudesRoute
+  '/ubicaciones': typeof UbicacionesRoute
+  '/usuarios': typeof UsuariosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/catalogo'
+    | '/categorias'
     | '/dashboard'
     | '/login'
     | '/movimientos'
     | '/productos'
     | '/solicitudes'
+    | '/ubicaciones'
+    | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/catalogo'
+    | '/categorias'
     | '/dashboard'
     | '/login'
     | '/movimientos'
     | '/productos'
     | '/solicitudes'
+    | '/ubicaciones'
+    | '/usuarios'
   id:
     | '__root__'
     | '/'
     | '/catalogo'
+    | '/categorias'
     | '/dashboard'
     | '/login'
     | '/movimientos'
     | '/productos'
     | '/solicitudes'
+    | '/ubicaciones'
+    | '/usuarios'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CatalogoRoute: typeof CatalogoRoute
+  CategoriasRoute: typeof CategoriasRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   MovimientosRoute: typeof MovimientosRoute
   ProductosRoute: typeof ProductosRoute
   SolicitudesRoute: typeof SolicitudesRoute
+  UbicacionesRoute: typeof UbicacionesRoute
+  UsuariosRoute: typeof UsuariosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ubicaciones': {
+      id: '/ubicaciones'
+      path: '/ubicaciones'
+      fullPath: '/ubicaciones'
+      preLoaderRoute: typeof UbicacionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solicitudes': {
       id: '/solicitudes'
       path: '/solicitudes'
@@ -158,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categorias': {
+      id: '/categorias'
+      path: '/categorias'
+      fullPath: '/categorias'
+      preLoaderRoute: typeof CategoriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalogo': {
       id: '/catalogo'
       path: '/catalogo'
@@ -178,12 +238,24 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CatalogoRoute: CatalogoRoute,
+  CategoriasRoute: CategoriasRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   MovimientosRoute: MovimientosRoute,
   ProductosRoute: ProductosRoute,
   SolicitudesRoute: SolicitudesRoute,
+  UbicacionesRoute: UbicacionesRoute,
+  UsuariosRoute: UsuariosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
