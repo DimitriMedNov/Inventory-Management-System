@@ -238,9 +238,13 @@ export type Database = {
           estatus: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion: string | null
           fecha_entrega: string | null
+          fecha_lista: string | null
+          fecha_requerida: string | null
           fecha_solicitud: string
           folio: number
           id: string
+          preparado_por: string | null
+          recibido_por: string | null
           updated_at: string
           usuario_id: string
         }
@@ -254,9 +258,13 @@ export type Database = {
           estatus?: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion?: string | null
           fecha_entrega?: string | null
+          fecha_lista?: string | null
+          fecha_requerida?: string | null
           fecha_solicitud?: string
           folio?: number
           id?: string
+          preparado_por?: string | null
+          recibido_por?: string | null
           updated_at?: string
           usuario_id: string
         }
@@ -270,9 +278,13 @@ export type Database = {
           estatus?: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion?: string | null
           fecha_entrega?: string | null
+          fecha_lista?: string | null
+          fecha_requerida?: string | null
           fecha_solicitud?: string
           folio?: number
           id?: string
+          preparado_por?: string | null
+          recibido_por?: string | null
           updated_at?: string
           usuario_id?: string
         }
@@ -337,9 +349,13 @@ export type Database = {
           estatus: Database["public"]["Enums"]["solicitud_estatus"]
           fecha_autorizacion: string | null
           fecha_entrega: string | null
+          fecha_lista: string | null
+          fecha_requerida: string | null
           fecha_solicitud: string
           folio: number
           id: string
+          preparado_por: string | null
+          recibido_por: string | null
           updated_at: string
           usuario_id: string
         }
@@ -381,6 +397,7 @@ export type Database = {
         | "aprobada"
         | "rechazada"
         | "cancelada"
+        | "lista"
         | "entregada"
     }
     CompositeTypes: {
@@ -516,6 +533,7 @@ export const Constants = {
         "aprobada",
         "rechazada",
         "cancelada",
+        "lista",
         "entregada",
       ],
     },
