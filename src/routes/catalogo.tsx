@@ -99,8 +99,8 @@ function Inner() {
   return (
     <>
       <PageHeader
-        title="Catálogo de artículos"
-        description="Consulta el inventario y crea solicitudes al almacén."
+        title="Inventario disponible"
+        description="Consulta los artículos en almacén y crea solicitudes internas."
         actions={
           carrito.length > 0 && (
             <Button onClick={() => setOpen(true)}>

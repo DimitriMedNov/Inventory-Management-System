@@ -6,7 +6,6 @@ import {
   Package,
   ArrowLeftRight,
   ClipboardList,
-  ShoppingCart,
   LogOut,
   Boxes,
   ShieldCheck,
@@ -14,8 +13,10 @@ import {
   Tags,
   MapPin,
   Users,
+  Warehouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import diprolamIcon from "@/assets/diprolam-icon.png";
 
 interface NavItem {
   to: string;
@@ -26,10 +27,10 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Panel principal", icon: LayoutDashboard, roles: ["admin", "almacen", "solicitante"] },
-  { to: "/productos", label: "Inventario", icon: Package, roles: ["admin", "almacen"] },
+  { to: "/productos", label: "Productos", icon: Package, roles: ["admin", "almacen"] },
   { to: "/movimientos", label: "Movimientos", icon: ArrowLeftRight, roles: ["admin", "almacen"] },
   { to: "/solicitudes", label: "Solicitudes", icon: ClipboardList, roles: ["admin", "almacen", "solicitante"] },
-  { to: "/catalogo", label: "Catálogo", icon: ShoppingCart, roles: ["solicitante", "admin", "almacen"] },
+  { to: "/catalogo", label: "Inventario", icon: Warehouse, roles: ["solicitante", "admin", "almacen"] },
   { to: "/categorias", label: "Categorías", icon: Tags, roles: ["admin", "almacen"] },
   { to: "/ubicaciones", label: "Ubicaciones", icon: MapPin, roles: ["admin", "almacen"] },
   { to: "/usuarios", label: "Usuarios", icon: Users, roles: ["admin"] },
@@ -68,12 +69,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
         style={{ width: "var(--sidebar-width)" }}
       >
         <div className="flex items-center gap-2 px-5 border-b border-sidebar-border" style={{ height: "var(--header-height)" }}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-accent">
-            <Boxes className="h-5 w-5" />
-          </div>
+          <img src={diprolamIcon} alt="Diprolam" className="h-9 w-9 rounded-md bg-white p-1" />
           <div className="leading-tight">
-            <div className="font-semibold text-sm">Inventario Taller</div>
-            <div className="text-[11px] text-sidebar-foreground/60">Sistema empresarial</div>
+            <div className="font-semibold text-sm">Diprolam Bjx</div>
+            <div className="text-[11px] text-sidebar-foreground/70">Inventario interno</div>
           </div>
         </div>
 
@@ -116,7 +115,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           style={{ height: "var(--header-height)" }}
         >
           <div>
-            <div className="text-xs text-muted-foreground">Sistema de inventario</div>
+            <div className="text-xs text-muted-foreground">Diprolam Bjx</div>
             <div className="text-sm font-semibold">{currentTitle(location.pathname)}</div>
           </div>
           <div className="flex items-center gap-3">
@@ -140,12 +139,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
 function currentTitle(path: string) {
   if (path.startsWith("/dashboard")) return "Panel principal";
-  if (path.startsWith("/productos")) return "Inventario de productos";
+  if (path.startsWith("/productos")) return "Productos";
   if (path.startsWith("/movimientos")) return "Movimientos de inventario";
   if (path.startsWith("/solicitudes")) return "Solicitudes internas";
-  if (path.startsWith("/catalogo")) return "Catálogo de artículos";
-  if (path.startsWith("/categorias")) return "Catálogo de categorías";
-  if (path.startsWith("/ubicaciones")) return "Catálogo de ubicaciones";
+  if (path.startsWith("/catalogo")) return "Inventario disponible";
+  if (path.startsWith("/categorias")) return "Categorías";
+  if (path.startsWith("/ubicaciones")) return "Ubicaciones";
   if (path.startsWith("/usuarios")) return "Gestión de usuarios";
   return "Panel";
 }
