@@ -14,6 +14,7 @@ import {
   MapPin,
   Users,
   Warehouse,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import diprolamIcon from "@/assets/diprolam-icon.png";
@@ -33,6 +34,7 @@ const NAV: NavItem[] = [
   { to: "/catalogo", label: "Inventario", icon: Warehouse, roles: ["solicitante", "admin", "almacen"] },
   { to: "/categorias", label: "Categorías", icon: Tags, roles: ["admin", "almacen"] },
   { to: "/ubicaciones", label: "Ubicaciones", icon: MapPin, roles: ["admin", "almacen"] },
+  { to: "/proyectos", label: "Proyectos", icon: Briefcase, roles: ["admin"] },
   { to: "/usuarios", label: "Usuarios", icon: Users, roles: ["admin"] },
 ];
 
@@ -145,6 +147,7 @@ function currentTitle(path: string) {
   if (path.startsWith("/catalogo")) return "Inventario disponible";
   if (path.startsWith("/categorias")) return "Categorías";
   if (path.startsWith("/ubicaciones")) return "Ubicaciones";
+  if (path.startsWith("/proyectos")) return "Proyectos";
   if (path.startsWith("/usuarios")) return "Gestión de usuarios";
   return "Panel";
 }
