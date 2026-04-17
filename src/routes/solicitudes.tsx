@@ -33,7 +33,9 @@ interface Sol {
   fecha_lista: string | null;
   fecha_entrega: string | null;
   usuario_id: string;
+  proyecto_id: string | null;
   profiles: { nombre: string; area: string | null } | null;
+  proyectos: { codigo: string; nombre: string } | null;
 }
 
 interface Detalle {
@@ -60,7 +62,7 @@ function Inner() {
 
   const load = useCallback(async () => {
     let q = supabase.from("solicitudes")
-      .select("*")
+      .select("*, proyectos(codigo, nombre)")
       .order("fecha_solicitud", { ascending: false });
     if (role === "solicitante" && user) q = q.eq("usuario_id", user.id);
     const { data, error } = await q;
@@ -190,6 +192,7 @@ function Inner() {
           <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
             <tr className="text-left">
               <th className="px-4 py-3 font-medium">Folio</th>
+              <th className="px-4 py-3 font-medium">Proyecto</th>
               <th className="px-4 py-3 font-medium">Solicitante</th>
               <th className="px-4 py-3 font-medium">Área</th>
               <th className="px-4 py-3 font-medium">Solicitada</th>
@@ -203,6 +206,11 @@ function Inner() {
             {filtered.map((s) => (
               <tr key={s.id} className="hover:bg-muted/30">
                 <td className="px-4 py-3 font-mono">#{s.folio}</td>
+                <td className="px-4 py-3">
+                  {s.proyectos
+                    ? <div><div className="font-mono text-xs">{s.proyectos.codigo}</div><div className="text-xs text-muted-foreground">{s.proyectos.nombre}</div></div>
+                    : <span className="text-xs text-muted-foreground">—</span>}
+                </td>
                 <td className="px-4 py-3 font-medium">{s.profiles?.nombre ?? "—"}</td>
                 <td className="px-4 py-3 text-muted-foreground">{s.profiles?.area ?? "—"}</td>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDateTime(s.fecha_solicitud)}</td>
@@ -219,7 +227,7 @@ function Inner() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
+              <tr><td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
                 {enHistorial ? "Aún no hay solicitudes cerradas." : "Sin solicitudes activas en este filtro."}
               </td></tr>
             )}
@@ -238,6 +246,12 @@ function Inner() {
               </DialogHeader>
 
               <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                {detail.proyectos && (
+                  <div className="col-span-2 rounded-md bg-primary/5 border border-primary/20 p-2">
+                    <div className="text-xs text-muted-foreground">Proyecto</div>
+                    <div className="font-medium font-mono text-sm">{detail.proyectos.codigo} — <span className="font-sans">{detail.proyectos.nombre}</span></div>
+                  </div>
+                )}
                 <div><div className="text-xs text-muted-foreground">Solicitante</div><div className="font-medium">{detail.profiles?.nombre}</div></div>
                 <div><div className="text-xs text-muted-foreground">Área</div><div className="font-medium">{detail.profiles?.area ?? "—"}</div></div>
                 <div><div className="text-xs text-muted-foreground">Fecha solicitud</div><div>{fmtDateTime(detail.fecha_solicitud)}</div></div>
