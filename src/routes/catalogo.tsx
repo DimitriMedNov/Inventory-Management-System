@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { Search, Plus, Trash2, ShoppingCart, AlertTriangle } from "lucide-react";
+import { Search, Plus, Trash2, ShoppingCart, AlertTriangle, Briefcase, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalogo")({
