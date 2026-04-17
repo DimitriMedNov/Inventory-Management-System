@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Eye, CheckCircle2, XCircle, PackageCheck, HandCoins, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import { fmtDateTime, fmtDate } from "@/lib/fmt";
 
 export const Route = createFileRoute("/solicitudes")({
   component: Page,
@@ -42,8 +43,7 @@ interface Detalle {
   productos: { nombre: string; sku: string; unidad_medida: string; stock_actual: number } | null;
 }
 
-const fmtDate = (v: string | null) => v ? new Date(v).toLocaleString() : "—";
-const fmtDay = (v: string | null) => v ? new Date(v).toLocaleDateString() : "—";
+const HISTORIAL: Estatus[] = ["entregada", "rechazada", "cancelada"];
 
 function Page() {
   return <RequireAuth><Inner /></RequireAuth>;
