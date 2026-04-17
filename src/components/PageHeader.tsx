@@ -60,6 +60,7 @@ export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     pendiente: "bg-warning/15 text-warning-foreground border border-warning/30",
     aprobada: "bg-info/10 text-info border border-info/30",
+    lista: "bg-primary/10 text-primary border border-primary/30",
     entregada: "bg-success/10 text-success border border-success/30",
     rechazada: "bg-destructive/10 text-destructive border border-destructive/30",
     cancelada: "bg-muted text-muted-foreground border border-border",
@@ -67,10 +68,13 @@ export function StatusBadge({ status }: { status: string }) {
     salida: "bg-destructive/10 text-destructive border border-destructive/30",
     ajuste: "bg-info/10 text-info border border-info/30",
   };
+  const labels: Record<string, string> = {
+    lista: "Lista para recoger",
+  };
   const cls = map[status] ?? "bg-muted text-muted-foreground border border-border";
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${cls}`}>
-      {status}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>
+      {labels[status] ?? status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
 }
