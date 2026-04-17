@@ -12,13 +12,10 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { session, signIn, signUp, loading } = useAuth();
+  const { session, signIn, loading } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [area, setArea] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -29,14 +26,8 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "login") {
-        await signIn(email, password);
-        toast.success("Sesión iniciada");
-      } else {
-        await signUp(email, password, nombre, area);
-        toast.success("Cuenta creada. Iniciando sesión...");
-        await signIn(email, password);
-      }
+      await signIn(email, password);
+      toast.success("Sesión iniciada");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error";
       toast.error(msg);
@@ -88,28 +79,12 @@ function LoginPage() {
             <div className="font-semibold">Inventario Taller</div>
           </div>
 
-          <h2 className="text-2xl font-semibold tracking-tight">
-            {mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
-          </h2>
+          <h2 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h2>
           <p className="text-sm text-muted-foreground mt-1 mb-6">
-            {mode === "login"
-              ? "Ingresa con tu correo corporativo."
-              : "El primer usuario registrado será administrador."}
+            Ingresa con tu correo corporativo.
           </p>
 
           <form onSubmit={submit} className="space-y-4">
-            {mode === "signup" && (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="nombre">Nombre completo</Label>
-                  <Input id="nombre" required value={nombre} onChange={(e) => setNombre(e.target.value)} />
-                </div>
-                <div>
-                  <Label htmlFor="area">Área / Departamento</Label>
-                  <Input id="area" value={area} onChange={(e) => setArea(e.target.value)} placeholder="Ej. Producción" />
-                </div>
-              </div>
-            )}
             <div>
               <Label htmlFor="email">Correo</Label>
               <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -119,26 +94,12 @@ function LoginPage() {
               <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <Button type="submit" className="w-full" disabled={busy}>
-              {busy ? "Procesando..." : mode === "login" ? "Entrar" : "Crear cuenta"}
+              {busy ? "Procesando..." : "Entrar"}
             </Button>
           </form>
 
-          <div className="text-center mt-6 text-sm text-muted-foreground">
-            {mode === "login" ? (
-              <>
-                ¿Sin cuenta?{" "}
-                <button onClick={() => setMode("signup")} className="text-primary font-medium hover:underline">
-                  Regístrate
-                </button>
-              </>
-            ) : (
-              <>
-                ¿Ya tienes cuenta?{" "}
-                <button onClick={() => setMode("login")} className="text-primary font-medium hover:underline">
-                  Inicia sesión
-                </button>
-              </>
-            )}
+          <div className="text-center mt-6 text-xs text-muted-foreground">
+            Acceso restringido. Si no tienes cuenta, contacta al administrador.
           </div>
         </div>
       </div>
