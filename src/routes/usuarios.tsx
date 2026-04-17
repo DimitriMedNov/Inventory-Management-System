@@ -65,6 +65,8 @@ function Inner() {
   const [roles, setRoles] = useState<Map<string, AppRole>>(new Map());
   const [search, setSearch] = useState("");
   const [pendingActivo, setPendingActivo] = useState<{ user: ProfileRow; nuevo: boolean } | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const createUserFn = useServerFn(createUserAdmin);
 
   const load = useCallback(async () => {
     const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
