@@ -51,6 +51,7 @@ function Inner() {
   const [comentario, setComentario] = useState("");
   const [fechaRequerida, setFechaRequerida] = useState("");
   const [proyectoId, setProyectoId] = useState<string>("");
+  const [proyectoPrompt, setProyectoPrompt] = useState<{ open: boolean; pendiente: Producto | null; sel: string }>({ open: false, pendiente: null, sel: "" });
 
   const load = useCallback(async () => {
     const [{ data: p }, { data: c }, { data: pr }] = await Promise.all([
@@ -99,9 +100,7 @@ function Inner() {
     return matchSearch && matchCat;
   });
 
-  const addCarrito = (prod: Producto) => {
-    const disp = disponibleFor(prod.id, prod.stock_actual);
-    if (disp <= 0) { toast.error("Sin stock disponible"); return; }
+  const agregarProductoAlCarrito = (prod: Producto) => {
     const existing = carrito.find((l) => l.producto.id === prod.id);
     if (existing) {
       setCarrito(carrito.map((l) => l.producto.id === prod.id ? { ...l, cantidad: l.cantidad + 1 } : l));
@@ -109,6 +108,30 @@ function Inner() {
       setCarrito([...carrito, { producto: prod, cantidad: 1 }]);
     }
     toast.success(`${prod.nombre} agregado`);
+  };
+
+  const handleAgregar = (prod: Producto) => {
+    const disp = disponibleFor(prod.id, prod.stock_actual);
+    if (disp <= 0) { toast.error("Sin stock disponible"); return; }
+    if (proyectos.length === 0) { toast.error("No hay proyectos activos. Pide al admin que cree uno."); return; }
+    if (!proyectoId) {
+      setProyectoPrompt({ open: true, pendiente: prod, sel: "" });
+      return;
+    }
+    agregarProductoAlCarrito(prod);
+  };
+
+  const confirmarProyectoYAgregar = () => {
+    if (!proyectoPrompt.sel) { toast.error("Selecciona un proyecto"); return; }
+    setProyectoId(proyectoPrompt.sel);
+    if (proyectoPrompt.pendiente) agregarProductoAlCarrito(proyectoPrompt.pendiente);
+    setProyectoPrompt({ open: false, pendiente: null, sel: "" });
+  };
+
+  const cambiarProyecto = () => {
+    if (carrito.length > 0 && !confirm("Cambiar de proyecto vaciará el carrito actual. ¿Continuar?")) return;
+    setCarrito([]);
+    setProyectoId("");
   };
 
   const maxParaLinea = (l: Linea) => {
