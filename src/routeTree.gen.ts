@@ -20,7 +20,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProyectosIdRouteImport } from './routes/proyectos.$id'
+import { Route as ProyectosIdRouteImport } from './routes/proyectos_.$id'
 
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
@@ -78,9 +78,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProyectosIdRoute = ProyectosIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ProyectosRoute,
+  id: '/proyectos_/$id',
+  path: '/proyectos/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -91,7 +91,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
-  '/proyectos': typeof ProyectosRouteWithChildren
+  '/proyectos': typeof ProyectosRoute
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
@@ -105,7 +105,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
-  '/proyectos': typeof ProyectosRouteWithChildren
+  '/proyectos': typeof ProyectosRoute
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
@@ -120,11 +120,11 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
-  '/proyectos': typeof ProyectosRouteWithChildren
+  '/proyectos': typeof ProyectosRoute
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
-  '/proyectos/$id': typeof ProyectosIdRoute
+  '/proyectos_/$id': typeof ProyectosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,7 +168,7 @@ export interface FileRouteTypes {
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
-    | '/proyectos/$id'
+    | '/proyectos_/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -179,10 +179,11 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MovimientosRoute: typeof MovimientosRoute
   ProductosRoute: typeof ProductosRoute
-  ProyectosRoute: typeof ProyectosRouteWithChildren
+  ProyectosRoute: typeof ProyectosRoute
   SolicitudesRoute: typeof SolicitudesRoute
   UbicacionesRoute: typeof UbicacionesRoute
   UsuariosRoute: typeof UsuariosRoute
+  ProyectosIdRoute: typeof ProyectosIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -264,27 +265,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/proyectos/$id': {
-      id: '/proyectos/$id'
-      path: '/$id'
+    '/proyectos_/$id': {
+      id: '/proyectos_/$id'
+      path: '/proyectos/$id'
       fullPath: '/proyectos/$id'
       preLoaderRoute: typeof ProyectosIdRouteImport
-      parentRoute: typeof ProyectosRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface ProyectosRouteChildren {
-  ProyectosIdRoute: typeof ProyectosIdRoute
-}
-
-const ProyectosRouteChildren: ProyectosRouteChildren = {
-  ProyectosIdRoute: ProyectosIdRoute,
-}
-
-const ProyectosRouteWithChildren = ProyectosRoute._addFileChildren(
-  ProyectosRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -294,10 +283,11 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MovimientosRoute: MovimientosRoute,
   ProductosRoute: ProductosRoute,
-  ProyectosRoute: ProyectosRouteWithChildren,
+  ProyectosRoute: ProyectosRoute,
   SolicitudesRoute: SolicitudesRoute,
   UbicacionesRoute: UbicacionesRoute,
   UsuariosRoute: UsuariosRoute,
+  ProyectosIdRoute: ProyectosIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
