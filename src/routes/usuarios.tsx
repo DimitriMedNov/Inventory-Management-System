@@ -1,20 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { RequireAuth } from "@/components/RequireAuth";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
-import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX } from "lucide-react";
+import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { createUserAdmin } from "@/utils/users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
@@ -59,6 +65,8 @@ function Inner() {
   const [roles, setRoles] = useState<Map<string, AppRole>>(new Map());
   const [search, setSearch] = useState("");
   const [pendingActivo, setPendingActivo] = useState<{ user: ProfileRow; nuevo: boolean } | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const createUserFn = useServerFn(createUserAdmin);
 
   const load = useCallback(async () => {
     const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
@@ -114,6 +122,11 @@ function Inner() {
       <PageHeader
         title="Gestión de usuarios"
         description="Administra los miembros del sistema, sus roles y el estado de sus cuentas."
+        actions={
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" /> Nuevo usuario
+          </Button>
+        }
       />
 
       <div className="rounded-lg border border-border bg-card">
@@ -212,8 +225,29 @@ function Inner() {
       </div>
 
       <p className="text-xs text-muted-foreground mt-3">
-        Nota: la creación de nuevos usuarios se realiza desde la pantalla de registro. No puedes cambiar tu propio rol ni desactivar tu propia cuenta.
+        Nota: no puedes cambiar tu propio rol ni desactivar tu propia cuenta.
       </p>
+
+      <CreateUserDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreate={async (form) => {
+          try {
+            const res = await createUserFn({ data: form });
+            if (!res.ok) {
+              toast.error(res.error);
+              return false;
+            }
+            toast.success("Usuario creado");
+            setCreateOpen(false);
+            await load();
+            return true;
+          } catch (e: unknown) {
+            toast.error(e instanceof Error ? e.message : "Error al crear usuario");
+            return false;
+          }
+        }}
+      />
 
       <AlertDialog open={!!pendingActivo} onOpenChange={(o) => !o && setPendingActivo(null)}>
         <AlertDialogContent>
@@ -236,3 +270,118 @@ function Inner() {
     </>
   );
 }
+
+interface CreateUserForm {
+  nombre: string;
+  correo: string;
+  password: string;
+  area: string;
+  rol: AppRole;
+}
+
+function CreateUserDialog({
+  open,
+  onOpenChange,
+  onCreate,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onCreate: (form: { nombre: string; correo: string; password: string; area: string | null; rol: AppRole }) => Promise<boolean>;
+}) {
+  const [form, setForm] = useState<CreateUserForm>({
+    nombre: "",
+    correo: "",
+    password: "",
+    area: "",
+    rol: "solicitante",
+  });
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setForm({ nombre: "", correo: "", password: "", area: "", rol: "solicitante" });
+    }
+  }, [open]);
+
+  const submit = async () => {
+    if (form.nombre.trim().length < 2) return toast.error("Nombre demasiado corto");
+    if (!form.correo.trim()) return toast.error("Correo obligatorio");
+    if (form.password.length < 8) return toast.error("La contraseña debe tener al menos 8 caracteres");
+    setBusy(true);
+    await onCreate({
+      nombre: form.nombre.trim(),
+      correo: form.correo.trim(),
+      password: form.password,
+      area: form.area.trim() || null,
+      rol: form.rol,
+    });
+    setBusy(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Crear nuevo usuario</DialogTitle>
+          <DialogDescription>
+            La cuenta quedará activa y con email confirmado. Podrá iniciar sesión inmediatamente.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="col-span-2">
+            <Label>Nombre completo *</Label>
+            <Input
+              value={form.nombre}
+              maxLength={100}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Correo *</Label>
+            <Input
+              type="email"
+              value={form.correo}
+              maxLength={255}
+              onChange={(e) => setForm({ ...form, correo: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Área / Departamento</Label>
+            <Input
+              value={form.area}
+              maxLength={100}
+              onChange={(e) => setForm({ ...form, area: e.target.value })}
+              placeholder="Ej. Producción"
+            />
+          </div>
+          <div>
+            <Label>Contraseña temporal *</Label>
+            <Input
+              type="text"
+              value={form.password}
+              maxLength={72}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="Mínimo 8 caracteres"
+            />
+          </div>
+          <div>
+            <Label>Rol *</Label>
+            <Select value={form.rol} onValueChange={(v) => setForm({ ...form, rol: v as AppRole })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Administrador</SelectItem>
+                <SelectItem value="almacen">Encargado de almacén</SelectItem>
+                <SelectItem value="solicitante">Solicitante</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>Cancelar</Button>
+          <Button onClick={submit} disabled={busy}>{busy ? "Creando..." : "Crear usuario"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
