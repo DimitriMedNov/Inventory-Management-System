@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as UbicacionesRouteImport } from './routes/ubicaciones'
 import { Route as SolicitudesRouteImport } from './routes/solicitudes'
+import { Route as ProyectosRouteImport } from './routes/proyectos'
 import { Route as ProductosRouteImport } from './routes/productos'
 import { Route as MovimientosRouteImport } from './routes/movimientos'
 import { Route as LoginRouteImport } from './routes/login'
@@ -33,6 +34,11 @@ const UbicacionesRoute = UbicacionesRouteImport.update({
 const SolicitudesRoute = SolicitudesRouteImport.update({
   id: '/solicitudes',
   path: '/solicitudes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProyectosRoute = ProyectosRouteImport.update({
+  id: '/proyectos',
+  path: '/proyectos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductosRoute = ProductosRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
+  '/proyectos': typeof ProyectosRoute
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
+  '/proyectos': typeof ProyectosRoute
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
+  '/proyectos': typeof ProyectosRoute
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/movimientos'
     | '/productos'
+    | '/proyectos'
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/movimientos'
     | '/productos'
+    | '/proyectos'
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/movimientos'
     | '/productos'
+    | '/proyectos'
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MovimientosRoute: typeof MovimientosRoute
   ProductosRoute: typeof ProductosRoute
+  ProyectosRoute: typeof ProyectosRoute
   SolicitudesRoute: typeof SolicitudesRoute
   UbicacionesRoute: typeof UbicacionesRoute
   UsuariosRoute: typeof UsuariosRoute
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/solicitudes'
       fullPath: '/solicitudes'
       preLoaderRoute: typeof SolicitudesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proyectos': {
+      id: '/proyectos'
+      path: '/proyectos'
+      fullPath: '/proyectos'
+      preLoaderRoute: typeof ProyectosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/productos': {
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MovimientosRoute: MovimientosRoute,
   ProductosRoute: ProductosRoute,
+  ProyectosRoute: ProyectosRoute,
   SolicitudesRoute: SolicitudesRoute,
   UbicacionesRoute: UbicacionesRoute,
   UsuariosRoute: UsuariosRoute,
@@ -250,12 +271,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

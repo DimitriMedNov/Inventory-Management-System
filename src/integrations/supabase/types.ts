@@ -227,6 +227,36 @@ export type Database = {
         }
         Relationships: []
       }
+      proyectos: {
+        Row: {
+          activo: boolean
+          codigo: string
+          created_at: string
+          descripcion: string | null
+          id: string
+          nombre: string
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       solicitudes: {
         Row: {
           autorizado_por: string | null
@@ -244,6 +274,7 @@ export type Database = {
           folio: number
           id: string
           preparado_por: string | null
+          proyecto_id: string | null
           recibido_por: string | null
           updated_at: string
           usuario_id: string
@@ -264,6 +295,7 @@ export type Database = {
           folio?: number
           id?: string
           preparado_por?: string | null
+          proyecto_id?: string | null
           recibido_por?: string | null
           updated_at?: string
           usuario_id: string
@@ -284,11 +316,20 @@ export type Database = {
           folio?: number
           id?: string
           preparado_por?: string | null
+          proyecto_id?: string | null
           recibido_por?: string | null
           updated_at?: string
           usuario_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "solicitudes_proyecto_id_fkey"
+            columns: ["proyecto_id"]
+            isOneToOne: false
+            referencedRelation: "proyectos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ubicaciones: {
         Row: {
@@ -355,6 +396,7 @@ export type Database = {
           folio: number
           id: string
           preparado_por: string | null
+          proyecto_id: string | null
           recibido_por: string | null
           updated_at: string
           usuario_id: string
@@ -384,6 +426,7 @@ export type Database = {
           folio: number
           id: string
           preparado_por: string | null
+          proyecto_id: string | null
           recibido_por: string | null
           updated_at: string
           usuario_id: string
@@ -424,6 +467,7 @@ export type Database = {
           folio: number
           id: string
           preparado_por: string | null
+          proyecto_id: string | null
           recibido_por: string | null
           updated_at: string
           usuario_id: string
