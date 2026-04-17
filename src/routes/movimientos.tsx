@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { fmtDateTime } from "@/lib/fmt";
 
 export const Route = createFileRoute("/movimientos")({
   component: Page,
@@ -101,7 +102,7 @@ function Inner() {
           <tbody className="divide-y divide-border">
             {movs.map((m) => (
               <tr key={m.id} className="hover:bg-muted/30">
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{new Date(m.fecha).toLocaleString()}</td>
+                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDateTime(m.fecha)}</td>
                 <td className="px-4 py-3"><StatusBadge status={m.tipo} /></td>
                 <td className="px-4 py-3 font-medium">{m.productos?.nombre ?? "—"}</td>
                 <td className="px-4 py-3 font-mono text-xs">{m.productos?.sku}</td>
