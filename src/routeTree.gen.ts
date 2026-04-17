@@ -20,6 +20,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProyectosIdRouteImport } from './routes/proyectos.$id'
 
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
@@ -76,6 +77,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProyectosIdRoute = ProyectosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProyectosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -85,10 +91,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
-  '/proyectos': typeof ProyectosRoute
+  '/proyectos': typeof ProyectosRouteWithChildren
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
+  '/proyectos/$id': typeof ProyectosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,10 +105,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
-  '/proyectos': typeof ProyectosRoute
+  '/proyectos': typeof ProyectosRouteWithChildren
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
+  '/proyectos/$id': typeof ProyectosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,10 +120,11 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/movimientos': typeof MovimientosRoute
   '/productos': typeof ProductosRoute
-  '/proyectos': typeof ProyectosRoute
+  '/proyectos': typeof ProyectosRouteWithChildren
   '/solicitudes': typeof SolicitudesRoute
   '/ubicaciones': typeof UbicacionesRoute
   '/usuarios': typeof UsuariosRoute
+  '/proyectos/$id': typeof ProyectosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
+    | '/proyectos/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
+    | '/proyectos/$id'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/solicitudes'
     | '/ubicaciones'
     | '/usuarios'
+    | '/proyectos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -167,7 +179,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MovimientosRoute: typeof MovimientosRoute
   ProductosRoute: typeof ProductosRoute
-  ProyectosRoute: typeof ProyectosRoute
+  ProyectosRoute: typeof ProyectosRouteWithChildren
   SolicitudesRoute: typeof SolicitudesRoute
   UbicacionesRoute: typeof UbicacionesRoute
   UsuariosRoute: typeof UsuariosRoute
@@ -252,8 +264,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/proyectos/$id': {
+      id: '/proyectos/$id'
+      path: '/$id'
+      fullPath: '/proyectos/$id'
+      preLoaderRoute: typeof ProyectosIdRouteImport
+      parentRoute: typeof ProyectosRoute
+    }
   }
 }
+
+interface ProyectosRouteChildren {
+  ProyectosIdRoute: typeof ProyectosIdRoute
+}
+
+const ProyectosRouteChildren: ProyectosRouteChildren = {
+  ProyectosIdRoute: ProyectosIdRoute,
+}
+
+const ProyectosRouteWithChildren = ProyectosRoute._addFileChildren(
+  ProyectosRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -263,7 +294,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MovimientosRoute: MovimientosRoute,
   ProductosRoute: ProductosRoute,
-  ProyectosRoute: ProyectosRoute,
+  ProyectosRoute: ProyectosRouteWithChildren,
   SolicitudesRoute: SolicitudesRoute,
   UbicacionesRoute: UbicacionesRoute,
   UsuariosRoute: UsuariosRoute,
@@ -271,3 +302,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
