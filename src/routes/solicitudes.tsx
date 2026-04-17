@@ -115,7 +115,7 @@ function Inner() {
     const { error } = await supabase.rpc("entregar_solicitud", {
       _solicitud_id: detail.id,
       _entregas: payload,
-      _comentarios: comentario || null,
+      _comentarios: comentario || undefined,
     });
     if (error) return toast.error(error.message);
     toast.success("Solicitud entregada y stock descontado");
