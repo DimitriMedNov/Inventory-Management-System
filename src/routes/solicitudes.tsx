@@ -155,7 +155,13 @@ function Inner() {
     setDetail(null); load();
   };
 
-  const filtered = sols.filter((s) => filter === "todas" ? true : s.estatus === filter);
+  const filtered = sols.filter((s) => {
+    if (filter === "todas") return !HISTORIAL.includes(s.estatus);
+    if (filter === "historial") return HISTORIAL.includes(s.estatus);
+    return s.estatus === filter;
+  });
+
+  const enHistorial = filter === "historial";
 
   return (
     <>
@@ -171,12 +177,11 @@ function Inner() {
 
       <Tabs value={filter} onValueChange={setFilter} className="mb-4">
         <TabsList>
-          <TabsTrigger value="todas">Todas</TabsTrigger>
+          <TabsTrigger value="todas">Activas</TabsTrigger>
           <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
           <TabsTrigger value="aprobada">Aprobadas</TabsTrigger>
           <TabsTrigger value="lista">Listas</TabsTrigger>
-          <TabsTrigger value="entregada">Entregadas</TabsTrigger>
-          <TabsTrigger value="rechazada">Rechazadas</TabsTrigger>
+          <TabsTrigger value="historial">Historial</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -190,7 +195,7 @@ function Inner() {
               <th className="px-4 py-3 font-medium">Solicitada</th>
               <th className="px-4 py-3 font-medium">Requerida</th>
               <th className="px-4 py-3 font-medium">Estatus</th>
-              <th className="px-4 py-3 font-medium">Entregada</th>
+              <th className="px-4 py-3 font-medium">{enHistorial ? "Cerrada" : "Entregada"}</th>
               <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
@@ -200,10 +205,12 @@ function Inner() {
                 <td className="px-4 py-3 font-mono">#{s.folio}</td>
                 <td className="px-4 py-3 font-medium">{s.profiles?.nombre ?? "—"}</td>
                 <td className="px-4 py-3 text-muted-foreground">{s.profiles?.area ?? "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDate(s.fecha_solicitud)}</td>
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDay(s.fecha_requerida)}</td>
+                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDateTime(s.fecha_solicitud)}</td>
+                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDate(s.fecha_requerida)}</td>
                 <td className="px-4 py-3"><StatusBadge status={s.estatus} /></td>
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{fmtDate(s.fecha_entrega)}</td>
+                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                  {fmtDateTime(s.fecha_entrega ?? s.fecha_autorizacion)}
+                </td>
                 <td className="px-4 py-3">
                   <Button size="sm" variant="ghost" onClick={() => openDetail(s)}>
                     <Eye className="h-3.5 w-3.5 mr-1" /> Ver
@@ -212,7 +219,9 @@ function Inner() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">Sin solicitudes en este filtro.</td></tr>
+              <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
+                {enHistorial ? "Aún no hay solicitudes cerradas." : "Sin solicitudes activas en este filtro."}
+              </td></tr>
             )}
           </tbody>
         </table>
@@ -231,11 +240,11 @@ function Inner() {
               <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                 <div><div className="text-xs text-muted-foreground">Solicitante</div><div className="font-medium">{detail.profiles?.nombre}</div></div>
                 <div><div className="text-xs text-muted-foreground">Área</div><div className="font-medium">{detail.profiles?.area ?? "—"}</div></div>
-                <div><div className="text-xs text-muted-foreground">Fecha solicitud</div><div>{fmtDate(detail.fecha_solicitud)}</div></div>
-                <div><div className="text-xs text-muted-foreground">Fecha requerida</div><div>{fmtDay(detail.fecha_requerida)}</div></div>
-                {detail.fecha_autorizacion && <div><div className="text-xs text-muted-foreground">Fecha autorización</div><div>{fmtDate(detail.fecha_autorizacion)}</div></div>}
-                {detail.fecha_lista && <div><div className="text-xs text-muted-foreground">Lista para recoger</div><div>{fmtDate(detail.fecha_lista)}</div></div>}
-                {detail.fecha_entrega && <div><div className="text-xs text-muted-foreground">Fecha entrega</div><div>{fmtDate(detail.fecha_entrega)}</div></div>}
+                <div><div className="text-xs text-muted-foreground">Fecha solicitud</div><div>{fmtDateTime(detail.fecha_solicitud)}</div></div>
+                <div><div className="text-xs text-muted-foreground">Fecha requerida</div><div>{fmtDate(detail.fecha_requerida)}</div></div>
+                {detail.fecha_autorizacion && <div><div className="text-xs text-muted-foreground">Fecha autorización</div><div>{fmtDateTime(detail.fecha_autorizacion)}</div></div>}
+                {detail.fecha_lista && <div><div className="text-xs text-muted-foreground">Lista para recoger</div><div>{fmtDateTime(detail.fecha_lista)}</div></div>}
+                {detail.fecha_entrega && <div><div className="text-xs text-muted-foreground">Fecha entrega</div><div>{fmtDateTime(detail.fecha_entrega)}</div></div>}
                 {detail.comentarios_usuario && <div className="col-span-2"><div className="text-xs text-muted-foreground">Comentarios del solicitante</div><div className="whitespace-pre-wrap">{detail.comentarios_usuario}</div></div>}
                 {detail.comentarios_admin && <div className="col-span-2"><div className="text-xs text-muted-foreground">Comentarios del administrador</div><div>{detail.comentarios_admin}</div></div>}
                 {detail.comentarios_almacen && <div className="col-span-2"><div className="text-xs text-muted-foreground">Comentarios de almacén</div><div>{detail.comentarios_almacen}</div></div>}

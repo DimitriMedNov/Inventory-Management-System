@@ -5,6 +5,7 @@ import { PageHeader, StatCard, StatusBadge } from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, AlertTriangle, ClipboardList, CheckCircle2, ArrowDown, ArrowUp } from "lucide-react";
+import { fmtDateTime } from "@/lib/fmt";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -121,7 +122,7 @@ function DashboardInner() {
                     </div>
                     <div>
                       <div className="text-sm font-medium">{m.productos?.nombre ?? "—"}</div>
-                      <div className="text-xs text-muted-foreground">{m.productos?.sku} · {new Date(m.fecha).toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">{m.productos?.sku} · {fmtDateTime(m.fecha)}</div>
                     </div>
                   </div>
                   <div className="text-right">
@@ -146,7 +147,7 @@ function DashboardInner() {
               <div key={s.id} className="px-5 py-3 flex items-center justify-between">
                 <div>
                   <div className="text-sm font-medium">Folio #{s.folio} · {s.profiles?.nombre ?? ""}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(s.fecha_solicitud).toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">{fmtDateTime(s.fecha_solicitud)}</div>
                 </div>
                 <StatusBadge status={s.estatus} />
               </div>
