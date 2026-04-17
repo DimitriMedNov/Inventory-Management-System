@@ -142,10 +142,8 @@ function Inner() {
                 const open = !!expanded[s.id];
                 const items = s.detalle_solicitud.length;
                 return (
-                  <>
-                    <tr key={s.id} className="hover:bg-muted/30">
-                      <td className="px-4 py-3 font-mono">#{s.folio}</td>
-                      <td className="px-4 py-3">
+                  <FragmentRow key={s.id} s={s} open={open} onToggle={() => setExpanded((e) => ({ ...e, [s.id]: !open }))} />
+                );
                         <div className="font-medium">{s.profiles?.nombre ?? "—"}</div>
                         {s.profiles?.area && <div className="text-xs text-muted-foreground">{s.profiles.area}</div>}
                       </td>
