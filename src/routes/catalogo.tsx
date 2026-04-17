@@ -257,21 +257,25 @@ function Inner() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Confirmar solicitud</DialogTitle></DialogHeader>
 
-          <div className="mb-3">
-            <Label>Proyecto *</Label>
-            <Select value={proyectoId} onValueChange={setProyectoId}>
-              <SelectTrigger><SelectValue placeholder="Selecciona el proyecto al que se asigna" /></SelectTrigger>
-              <SelectContent>
-                {proyectos.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.codigo} — {p.nombre}</SelectItem>
-                ))}
-                {proyectos.length === 0 && (
-                  <div className="px-2 py-3 text-xs text-muted-foreground">No hay proyectos activos. Pide al administrador que cree uno.</div>
-                )}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">¿A qué proyecto se carga este material?</p>
-          </div>
+          {(() => {
+            const proy = proyectos.find((p) => p.id === proyectoId);
+            return (
+              <div className="mb-3 rounded-md bg-primary/5 border border-primary/20 p-3 flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Briefcase className="h-4 w-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs text-muted-foreground">Proyecto</div>
+                    <div className="font-medium text-sm truncate">
+                      <span className="font-mono">{proy?.codigo}</span> — {proy?.nombre}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => { setOpen(false); cambiarProyecto(); }}>
+                  Cambiar
+                </Button>
+              </div>
+            );
+          })()}
 
           <div className="rounded-md border border-border overflow-hidden mb-3">
             <table className="w-full text-sm">
@@ -337,6 +341,38 @@ function Inner() {
             <Button onClick={enviar} disabled={!proyectoId || carritoInvalido || carrito.length === 0}>
               Enviar solicitud
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo: pedir proyecto antes de agregar el primer producto */}
+      <Dialog open={proyectoPrompt.open} onOpenChange={(o) => !o && setProyectoPrompt({ open: false, pendiente: null, sel: "" })}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>¿Para qué proyecto?</DialogTitle>
+          </DialogHeader>
+          {proyectoPrompt.pendiente && (
+            <div className="rounded-md border border-border p-3 mb-3 text-sm">
+              <div className="text-xs text-muted-foreground">Vas a agregar</div>
+              <div className="font-medium">{proyectoPrompt.pendiente.nombre}</div>
+              <div className="text-xs text-muted-foreground">{proyectoPrompt.pendiente.sku}</div>
+            </div>
+          )}
+          <div>
+            <Label>Proyecto *</Label>
+            <Select value={proyectoPrompt.sel} onValueChange={(v) => setProyectoPrompt((s) => ({ ...s, sel: v }))}>
+              <SelectTrigger><SelectValue placeholder="Selecciona un proyecto" /></SelectTrigger>
+              <SelectContent>
+                {proyectos.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.codigo} — {p.nombre}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">Toda la solicitud se cargará a este proyecto.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProyectoPrompt({ open: false, pendiente: null, sel: "" })}>Cancelar</Button>
+            <Button onClick={confirmarProyectoYAgregar} disabled={!proyectoPrompt.sel}>Agregar al carrito</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
