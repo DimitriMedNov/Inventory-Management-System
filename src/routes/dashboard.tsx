@@ -49,8 +49,16 @@ function DashboardInner() {
         user ? supabase.from("solicitudes").select("*", { count: "exact", head: true }).eq("usuario_id", user.id).eq("estatus", "entregada") : Promise.resolve({ count: 0 }),
         supabase.from("movimientos_inventario").select("*", { count: "exact", head: true }),
         supabase.from("movimientos_inventario").select("id, tipo, cantidad, fecha, productos(nombre, sku)").order("fecha", { ascending: false }).limit(8),
-        supabase.from("solicitudes").select("id, folio, estatus, fecha_solicitud, profiles(nombre)").order("fecha_solicitud", { ascending: false }).limit(8),
+        supabase.from("solicitudes").select("id, folio, estatus, fecha_solicitud, usuario_id").order("fecha_solicitud", { ascending: false }).limit(8),
       ]);
+
+      const solRows = (ultSol.data ?? []) as Array<{ id: string; folio: number; estatus: string; fecha_solicitud: string; usuario_id: string }>;
+      const userIds = Array.from(new Set(solRows.map((s) => s.usuario_id)));
+      let profMap: Record<string, string> = {};
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("id, nombre").in("id", userIds);
+        profMap = Object.fromEntries((profs ?? []).map((p) => [p.id, p.nombre]));
+      }
 
       const stockBajoCount = (stockBajo.data || []).filter((p) => Number(p.stock_actual) <= Number(p.stock_minimo)).length;
 
@@ -65,7 +73,7 @@ function DashboardInner() {
         movimientos: movCount.count ?? 0,
       });
       setMovs((ultMov.data ?? []) as unknown as Movimiento[]);
-      setRecientes((ultSol.data ?? []) as unknown as Solicitud[]);
+      setRecientes(solRows.map((s) => ({ ...s, profiles: { nombre: profMap[s.usuario_id] ?? "—" } })) as unknown as Solicitud[]);
     })();
   }, [user]);
 

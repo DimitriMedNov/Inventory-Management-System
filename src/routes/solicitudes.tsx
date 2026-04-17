@@ -53,21 +53,31 @@ function Inner() {
 
   const load = useCallback(async () => {
     let q = supabase.from("solicitudes")
-      .select("*, profiles(nombre, area)")
+      .select("*")
       .order("fecha_solicitud", { ascending: false });
     if (role === "solicitante" && user) q = q.eq("usuario_id", user.id);
-    const { data } = await q;
-    setSols((data ?? []) as unknown as Sol[]);
+    const { data, error } = await q;
+    if (error) { toast.error(error.message); return; }
+    const rows = (data ?? []) as unknown as Sol[];
+    const ids = Array.from(new Set(rows.map((r) => r.usuario_id)));
+    let profMap: Record<string, { nombre: string; area: string | null }> = {};
+    if (ids.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles").select("id, nombre, area").in("id", ids);
+      profMap = Object.fromEntries((profs ?? []).map((p) => [p.id, { nombre: p.nombre, area: p.area }]));
+    }
+    setSols(rows.map((r) => ({ ...r, profiles: profMap[r.usuario_id] ?? null })));
   }, [role, user]);
   useEffect(() => { load(); }, [load]);
 
   const openDetail = async (s: Sol) => {
     setDetail(s);
     setComentario("");
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("detalle_solicitud")
       .select("id, cantidad_solicitada, cantidad_entregada, productos(nombre, sku, unidad_medida, stock_actual)")
       .eq("solicitud_id", s.id);
+    if (error) { toast.error(error.message); return; }
     const det = (data ?? []) as unknown as Detalle[];
     setDetalles(det);
     const initEntr: Record<string, number> = {};
@@ -130,11 +140,9 @@ function Inner() {
         title="Solicitudes internas"
         description={role === "solicitante" ? "Tus solicitudes al almacén." : "Gestión de solicitudes y entregas."}
         actions={
-          role === "solicitante" && (
-            <Link to="/catalogo">
-              <Button><ShoppingCart className="h-4 w-4 mr-1" /> Nueva solicitud</Button>
-            </Link>
-          )
+          <Link to="/catalogo">
+            <Button><ShoppingCart className="h-4 w-4 mr-1" /> Nueva solicitud</Button>
+          </Link>
         }
       />
 
