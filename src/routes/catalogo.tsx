@@ -189,6 +189,20 @@ function Inner() {
         }
       />
 
+      {proyectoId && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 flex-wrap">
+          <div className="flex items-center gap-2 text-sm min-w-0">
+            <Briefcase className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-muted-foreground">Solicitando para:</span>
+            <span className="font-medium font-mono">{proyectos.find((p) => p.id === proyectoId)?.codigo}</span>
+            <span className="font-medium truncate">{proyectos.find((p) => p.id === proyectoId)?.nombre}</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={cambiarProyecto}>
+            <X className="h-3.5 w-3.5 mr-1" /> Cambiar proyecto
+          </Button>
+        </div>
+      )}
+
       <div className="flex gap-3 mb-4 flex-wrap">
         <div className="relative flex-1 min-w-[260px] max-w-md">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -226,7 +240,7 @@ function Inner() {
                 </div>
                 <div><div className="text-muted-foreground">Ubicación</div><div className="font-medium">{p.ubicaciones?.nombre ?? "—"}</div></div>
               </div>
-              <Button size="sm" disabled={sinStock} onClick={() => addCarrito(p)}>
+              <Button size="sm" disabled={sinStock} onClick={() => handleAgregar(p)}>
                 <Plus className="h-4 w-4 mr-1" /> Agregar
               </Button>
             </div>
