@@ -361,6 +361,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      set_user_activo: {
+        Args: { _activo: boolean; _user_id: string }
+        Returns: undefined
+      }
+      set_user_role: {
+        Args: {
+          _new_role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "almacen" | "solicitante"

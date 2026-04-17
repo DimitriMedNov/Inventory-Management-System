@@ -11,6 +11,9 @@ import {
   Boxes,
   ShieldCheck,
   Wrench,
+  Tags,
+  MapPin,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +30,9 @@ const NAV: NavItem[] = [
   { to: "/movimientos", label: "Movimientos", icon: ArrowLeftRight, roles: ["admin", "almacen"] },
   { to: "/solicitudes", label: "Solicitudes", icon: ClipboardList, roles: ["admin", "almacen", "solicitante"] },
   { to: "/catalogo", label: "Catálogo", icon: ShoppingCart, roles: ["solicitante", "admin", "almacen"] },
+  { to: "/categorias", label: "Categorías", icon: Tags, roles: ["admin", "almacen"] },
+  { to: "/ubicaciones", label: "Ubicaciones", icon: MapPin, roles: ["admin", "almacen"] },
+  { to: "/usuarios", label: "Usuarios", icon: Users, roles: ["admin"] },
 ];
 
 const ROLE_LABEL: Record<AppRole, string> = {
@@ -138,5 +144,8 @@ function currentTitle(path: string) {
   if (path.startsWith("/movimientos")) return "Movimientos de inventario";
   if (path.startsWith("/solicitudes")) return "Solicitudes internas";
   if (path.startsWith("/catalogo")) return "Catálogo de artículos";
+  if (path.startsWith("/categorias")) return "Catálogo de categorías";
+  if (path.startsWith("/ubicaciones")) return "Catálogo de ubicaciones";
+  if (path.startsWith("/usuarios")) return "Gestión de usuarios";
   return "Panel";
 }
