@@ -8,7 +8,7 @@ import { ArrowLeft, Briefcase, CheckCircle2, XCircle, Package } from "lucide-rea
 import { toast } from "sonner";
 import { fmtDateTime } from "@/lib/fmt";
 
-export const Route = createFileRoute("/proyectos_/$id")({
+export const Route = createFileRoute("/proyectos/$id")({
   component: Page,
 });
 
