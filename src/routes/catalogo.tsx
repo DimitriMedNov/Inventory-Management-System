@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { Search, Plus, Trash2, ShoppingCart, AlertTriangle } from "lucide-react";
+import { Search, Plus, Trash2, ShoppingCart, AlertTriangle, Briefcase, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalogo")({
@@ -51,6 +51,7 @@ function Inner() {
   const [comentario, setComentario] = useState("");
   const [fechaRequerida, setFechaRequerida] = useState("");
   const [proyectoId, setProyectoId] = useState<string>("");
+  const [proyectoPrompt, setProyectoPrompt] = useState<{ open: boolean; pendiente: Producto | null; sel: string }>({ open: false, pendiente: null, sel: "" });
 
   const load = useCallback(async () => {
     const [{ data: p }, { data: c }, { data: pr }] = await Promise.all([
@@ -99,9 +100,7 @@ function Inner() {
     return matchSearch && matchCat;
   });
 
-  const addCarrito = (prod: Producto) => {
-    const disp = disponibleFor(prod.id, prod.stock_actual);
-    if (disp <= 0) { toast.error("Sin stock disponible"); return; }
+  const agregarProductoAlCarrito = (prod: Producto) => {
     const existing = carrito.find((l) => l.producto.id === prod.id);
     if (existing) {
       setCarrito(carrito.map((l) => l.producto.id === prod.id ? { ...l, cantidad: l.cantidad + 1 } : l));
@@ -109,6 +108,30 @@ function Inner() {
       setCarrito([...carrito, { producto: prod, cantidad: 1 }]);
     }
     toast.success(`${prod.nombre} agregado`);
+  };
+
+  const handleAgregar = (prod: Producto) => {
+    const disp = disponibleFor(prod.id, prod.stock_actual);
+    if (disp <= 0) { toast.error("Sin stock disponible"); return; }
+    if (proyectos.length === 0) { toast.error("No hay proyectos activos. Pide al admin que cree uno."); return; }
+    if (!proyectoId) {
+      setProyectoPrompt({ open: true, pendiente: prod, sel: "" });
+      return;
+    }
+    agregarProductoAlCarrito(prod);
+  };
+
+  const confirmarProyectoYAgregar = () => {
+    if (!proyectoPrompt.sel) { toast.error("Selecciona un proyecto"); return; }
+    setProyectoId(proyectoPrompt.sel);
+    if (proyectoPrompt.pendiente) agregarProductoAlCarrito(proyectoPrompt.pendiente);
+    setProyectoPrompt({ open: false, pendiente: null, sel: "" });
+  };
+
+  const cambiarProyecto = () => {
+    if (carrito.length > 0 && !confirm("Cambiar de proyecto vaciará el carrito actual. ¿Continuar?")) return;
+    setCarrito([]);
+    setProyectoId("");
   };
 
   const maxParaLinea = (l: Linea) => {
@@ -166,6 +189,20 @@ function Inner() {
         }
       />
 
+      {proyectoId && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 flex-wrap">
+          <div className="flex items-center gap-2 text-sm min-w-0">
+            <Briefcase className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-muted-foreground">Solicitando para:</span>
+            <span className="font-medium font-mono">{proyectos.find((p) => p.id === proyectoId)?.codigo}</span>
+            <span className="font-medium truncate">{proyectos.find((p) => p.id === proyectoId)?.nombre}</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={cambiarProyecto}>
+            <X className="h-3.5 w-3.5 mr-1" /> Cambiar proyecto
+          </Button>
+        </div>
+      )}
+
       <div className="flex gap-3 mb-4 flex-wrap">
         <div className="relative flex-1 min-w-[260px] max-w-md">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -203,7 +240,7 @@ function Inner() {
                 </div>
                 <div><div className="text-muted-foreground">Ubicación</div><div className="font-medium">{p.ubicaciones?.nombre ?? "—"}</div></div>
               </div>
-              <Button size="sm" disabled={sinStock} onClick={() => addCarrito(p)}>
+              <Button size="sm" disabled={sinStock} onClick={() => handleAgregar(p)}>
                 <Plus className="h-4 w-4 mr-1" /> Agregar
               </Button>
             </div>
@@ -220,21 +257,25 @@ function Inner() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Confirmar solicitud</DialogTitle></DialogHeader>
 
-          <div className="mb-3">
-            <Label>Proyecto *</Label>
-            <Select value={proyectoId} onValueChange={setProyectoId}>
-              <SelectTrigger><SelectValue placeholder="Selecciona el proyecto al que se asigna" /></SelectTrigger>
-              <SelectContent>
-                {proyectos.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.codigo} — {p.nombre}</SelectItem>
-                ))}
-                {proyectos.length === 0 && (
-                  <div className="px-2 py-3 text-xs text-muted-foreground">No hay proyectos activos. Pide al administrador que cree uno.</div>
-                )}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">¿A qué proyecto se carga este material?</p>
-          </div>
+          {(() => {
+            const proy = proyectos.find((p) => p.id === proyectoId);
+            return (
+              <div className="mb-3 rounded-md bg-primary/5 border border-primary/20 p-3 flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Briefcase className="h-4 w-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs text-muted-foreground">Proyecto</div>
+                    <div className="font-medium text-sm truncate">
+                      <span className="font-mono">{proy?.codigo}</span> — {proy?.nombre}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => { setOpen(false); cambiarProyecto(); }}>
+                  Cambiar
+                </Button>
+              </div>
+            );
+          })()}
 
           <div className="rounded-md border border-border overflow-hidden mb-3">
             <table className="w-full text-sm">
@@ -300,6 +341,38 @@ function Inner() {
             <Button onClick={enviar} disabled={!proyectoId || carritoInvalido || carrito.length === 0}>
               Enviar solicitud
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo: pedir proyecto antes de agregar el primer producto */}
+      <Dialog open={proyectoPrompt.open} onOpenChange={(o) => !o && setProyectoPrompt({ open: false, pendiente: null, sel: "" })}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>¿Para qué proyecto?</DialogTitle>
+          </DialogHeader>
+          {proyectoPrompt.pendiente && (
+            <div className="rounded-md border border-border p-3 mb-3 text-sm">
+              <div className="text-xs text-muted-foreground">Vas a agregar</div>
+              <div className="font-medium">{proyectoPrompt.pendiente.nombre}</div>
+              <div className="text-xs text-muted-foreground">{proyectoPrompt.pendiente.sku}</div>
+            </div>
+          )}
+          <div>
+            <Label>Proyecto *</Label>
+            <Select value={proyectoPrompt.sel} onValueChange={(v) => setProyectoPrompt((s) => ({ ...s, sel: v }))}>
+              <SelectTrigger><SelectValue placeholder="Selecciona un proyecto" /></SelectTrigger>
+              <SelectContent>
+                {proyectos.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.codigo} — {p.nombre}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">Toda la solicitud se cargará a este proyecto.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProyectoPrompt({ open: false, pendiente: null, sel: "" })}>Cancelar</Button>
+            <Button onClick={confirmarProyectoYAgregar} disabled={!proyectoPrompt.sel}>Agregar al carrito</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
