@@ -216,19 +216,29 @@ function Inner() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled={isMe}
-                        onClick={() => setPendingActivo({ user: u, nuevo: !u.activo })}
-                        className={u.activo ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}
-                      >
-                        {u.activo ? (
-                          <><UserX className="h-3.5 w-3.5 mr-1" /> Desactivar</>
-                        ) : (
-                          <><UserCheck className="h-3.5 w-3.5 mr-1" /> Activar</>
-                        )}
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setPendingResetUser(u)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          <KeyRound className="h-3.5 w-3.5 mr-1" /> Contraseña
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={isMe}
+                          onClick={() => setPendingActivo({ user: u, nuevo: !u.activo })}
+                          className={u.activo ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}
+                        >
+                          {u.activo ? (
+                            <><UserX className="h-3.5 w-3.5 mr-1" /> Desactivar</>
+                          ) : (
+                            <><UserCheck className="h-3.5 w-3.5 mr-1" /> Activar</>
+                          )}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
