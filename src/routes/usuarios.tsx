@@ -169,7 +169,7 @@ function Inner() {
                 <th className="px-4 py-3 font-medium">Área</th>
                 <th className="px-4 py-3 font-medium">Rol</th>
                 <th className="px-4 py-3 font-medium">Estado</th>
-                <th className="px-4 py-3 font-medium w-40 text-right">Acciones</th>
+                <th className="px-4 py-3 font-medium w-64 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
