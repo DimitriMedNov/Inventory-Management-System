@@ -1,53 +1,43 @@
 
 
-## Plan: Adaptar la app a móvil, tablet y laptop
-
-### Estado actual
-- **Sidebar**: visible solo en `md+` (≥768px). En móvil **no existe ningún botón para abrirlo** → la navegación queda inaccesible.
-- **Tablas** (productos, solicitudes, movimientos, usuarios, categorías, ubicaciones, proyectos): usan `overflow-x-auto` pero en celular obligan a scroll horizontal incómodo y no muestran toda la info.
-- **Diálogos** (formularios de productos, solicitudes, etc.): usan `grid-cols-2` fijo → en celular los inputs salen apretados.
-- **Header**: el bloque de usuario a la derecha se oculta en `<sm`, pero falta el botón de menú móvil.
-- **Login y catálogo**: ya son razonablemente responsive.
+## Plan: Instalación PWA básica (sin service worker)
 
 ### Cambios
 
-**1. Navegación móvil (`src/components/AppLayout.tsx`)**
-- Añadir botón hamburguesa visible solo en `<md` dentro del header.
-- Implementar el sidebar móvil con el componente `Sheet` (lateral izquierdo) reutilizando los mismos items de `NAV` y conservando el branding Diprolam.
-- Cerrar automáticamente el sheet al navegar a otra ruta.
-- Ajustar el header en móvil: ocultar el subtítulo "Diprolam Bjx", reducir paddings (`px-4 md:px-6`) y compactar el botón "Salir" a solo icono en pantallas pequeñas.
+**1. Crear `public/manifest.webmanifest`**
+- `name`: "Diprolam Bjx — Inventario"
+- `short_name`: "Diprolam"
+- `start_url`: "/dashboard"
+- `display`: "standalone"
+- `background_color`: "#ffffff"
+- `theme_color`: color del sidebar Diprolam (#58595B aprox)
+- `orientation`: "any"
+- `icons`: referencias a `/icon-192.png`, `/icon-512.png`, `/icon-512-maskable.png`
 
-**2. Tablas responsive (productos, solicitudes, movimientos, usuarios, categorías, ubicaciones, proyectos)**
-- Patrón estándar: `hidden md:table` para la tabla + lista de **tarjetas apiladas** `md:hidden` con la información clave (nombre, estado, badges, acción principal).
-- Cada tarjeta móvil mostrará: título principal + 2-3 datos secundarios + botones de acción táctiles (mín. 40px de alto).
+**2. Generar iconos PWA en `public/`** a partir del logo existente `src/assets/diprolam-icon.png`:
+- `icon-192.png` (192×192)
+- `icon-512.png` (512×512)
+- `icon-512-maskable.png` (512×512 con padding para Android)
+- `apple-touch-icon.png` (180×180 para iOS)
 
-**3. Diálogos / formularios**
-- Cambiar `grid-cols-2` por `grid-cols-1 sm:grid-cols-2` en los formularios de productos, solicitudes, usuarios y demás modales.
-- Asegurar `max-h-[90vh] overflow-y-auto` en todos los `DialogContent` para que en móvil se pueda hacer scroll dentro del modal.
-- Footers de diálogo: `flex-col-reverse sm:flex-row` para que en celular el botón principal quede arriba.
+**3. Actualizar `src/routes/__root.tsx`** — agregar al `head()`:
+- `<link rel="manifest" href="/manifest.webmanifest">`
+- `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`
+- `<meta name="theme-color" content="#58595B">`
+- `<meta name="apple-mobile-web-app-capable" content="yes">`
+- `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`
+- `<meta name="apple-mobile-web-app-title" content="Diprolam">`
 
-**4. Dashboard (`src/routes/dashboard.tsx`)**
-- Las métricas para admin/almacén pasan de `grid-cols-2 md:grid-cols-3 xl:grid-cols-6` a `grid-cols-2 sm:grid-cols-3 lg:grid-cols-6` (mejor uso del espacio en tablet).
-- En las listas de "Movimientos recientes" y "Solicitudes recientes" reducir paddings en móvil (`px-3 md:px-5`).
+### Resultado
+- **Android (Chrome):** menú ⋮ → "Instalar app".
+- **iOS (Safari):** compartir → "Agregar a pantalla de inicio".
+- **Laptop (Chrome/Edge):** ícono ⊕ en barra de direcciones → "Instalar Diprolam".
+- La app se abre en pantalla completa, sin barra del navegador, con su propio icono.
 
-**5. Catálogo (`src/routes/catalogo.tsx`)**
-- Verificar que las tarjetas usen `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` y que el filtro/buscador se apile en móvil.
+### Lo que NO incluye
+- ❌ Sin soporte offline (no hay service worker, intencionalmente para no romper el preview de Lovable).
+- ❌ Sin notificaciones push.
 
-**6. Variables globales (`src/styles.css`)**
-- Sin cambios estructurales; el sidebar fijo se mantiene en desktop y el `Sheet` se encarga del móvil.
-
-### Resultado esperado
-- **Móvil (≤640px)**: hamburguesa + sheet lateral, tablas convertidas en tarjetas apiladas, formularios en una sola columna, botones táctiles.
-- **Tablet (640–1024px)**: sidebar visible si hay espacio (≥768px), tablas con scroll horizontal cómodo, formularios en 2 columnas.
-- **Laptop/Desktop (≥1024px)**: layout actual sin cambios, máximo aprovechamiento del ancho.
-
-### Archivos a modificar
-- `src/components/AppLayout.tsx` (sidebar móvil + header responsive)
-- `src/routes/productos.tsx` (cards móvil + form responsive)
-- `src/routes/solicitudes.tsx` (cards móvil + diálogo responsive)
-- `src/routes/movimientos.tsx` (cards móvil)
-- `src/routes/usuarios.tsx` (cards móvil + diálogos responsive)
-- `src/routes/categorias.tsx`, `ubicaciones.tsx`, `proyectos.tsx` (cards móvil)
-- `src/routes/dashboard.tsx` (ajustes de grid)
-- `src/routes/catalogo.tsx` (verificación de breakpoints)
+### Nota sobre el preview
+La instalación funcionará completamente en la **versión publicada** de la app. En el preview del editor de Lovable algunos navegadores pueden no mostrar el botón de instalar porque la app está dentro de un iframe; eso es normal y no afecta a los usuarios finales.
 
