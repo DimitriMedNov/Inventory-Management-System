@@ -4,8 +4,9 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Boxes } from "lucide-react";
 import { toast } from "sonner";
+import diprolamLogo from "@/assets/diprolam-logo.png";
+import diprolamIcon from "@/assets/diprolam-icon.png";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
