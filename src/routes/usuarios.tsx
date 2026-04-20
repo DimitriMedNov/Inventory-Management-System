@@ -18,9 +18,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
-import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX, Plus } from "lucide-react";
+import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX, Plus, KeyRound } from "lucide-react";
 import { toast } from "sonner";
-import { createUserAdmin, setUserActivoAdmin } from "@/utils/users.functions";
+import { createUserAdmin, setUserActivoAdmin, resetUserPasswordAdmin } from "@/utils/users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
@@ -66,8 +66,10 @@ function Inner() {
   const [search, setSearch] = useState("");
   const [pendingActivo, setPendingActivo] = useState<{ user: ProfileRow; nuevo: boolean } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [pendingResetUser, setPendingResetUser] = useState<ProfileRow | null>(null);
   const createUserFn = useServerFn(createUserAdmin);
   const setActivoFn = useServerFn(setUserActivoAdmin);
+  const resetPasswordFn = useServerFn(resetUserPasswordAdmin);
 
   const load = useCallback(async () => {
     const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
@@ -167,7 +169,7 @@ function Inner() {
                 <th className="px-4 py-3 font-medium">Área</th>
                 <th className="px-4 py-3 font-medium">Rol</th>
                 <th className="px-4 py-3 font-medium">Estado</th>
-                <th className="px-4 py-3 font-medium w-40 text-right">Acciones</th>
+                <th className="px-4 py-3 font-medium w-64 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -214,19 +216,29 @@ function Inner() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled={isMe}
-                        onClick={() => setPendingActivo({ user: u, nuevo: !u.activo })}
-                        className={u.activo ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}
-                      >
-                        {u.activo ? (
-                          <><UserX className="h-3.5 w-3.5 mr-1" /> Desactivar</>
-                        ) : (
-                          <><UserCheck className="h-3.5 w-3.5 mr-1" /> Activar</>
-                        )}
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setPendingResetUser(u)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          <KeyRound className="h-3.5 w-3.5 mr-1" /> Contraseña
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={isMe}
+                          onClick={() => setPendingActivo({ user: u, nuevo: !u.activo })}
+                          className={u.activo ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}
+                        >
+                          {u.activo ? (
+                            <><UserX className="h-3.5 w-3.5 mr-1" /> Desactivar</>
+                          ) : (
+                            <><UserCheck className="h-3.5 w-3.5 mr-1" /> Activar</>
+                          )}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -240,7 +252,7 @@ function Inner() {
       </div>
 
       <p className="text-xs text-muted-foreground mt-3">
-        Nota: no puedes cambiar tu propio rol ni desactivar tu propia cuenta.
+        Nota: no puedes cambiar tu propio rol ni desactivar tu propia cuenta. Sí puedes restablecer tu propia contraseña.
       </p>
 
       <CreateUserDialog
@@ -292,6 +304,36 @@ function Inner() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ResetPasswordDialog
+        user={pendingResetUser}
+        onOpenChange={(o) => !o && setPendingResetUser(null)}
+        onReset={async (password) => {
+          if (!pendingResetUser) return false;
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+              toast.error("Sesión expirada. Inicia sesión de nuevo.");
+              return false;
+            }
+            const res = await resetPasswordFn({
+              data: { user_id: pendingResetUser.id, password },
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            if (!res.ok) {
+              toast.error(res.error || "No se pudo restablecer la contraseña");
+              return false;
+            }
+            toast.success(`Contraseña actualizada para ${pendingResetUser.nombre}`);
+            setPendingResetUser(null);
+            return true;
+          } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : "Error al restablecer contraseña";
+            toast.error(msg);
+            return false;
+          }
+        }}
+      />
     </>
   );
 }
@@ -404,6 +446,67 @@ function CreateUserDialog({
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>Cancelar</Button>
           <Button onClick={submit} disabled={busy}>{busy ? "Creando..." : "Crear usuario"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ResetPasswordDialog({
+  user,
+  onOpenChange,
+  onReset,
+}: {
+  user: ProfileRow | null;
+  onOpenChange: (open: boolean) => void;
+  onReset: (password: string) => Promise<boolean>;
+}) {
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (user) setPassword("");
+  }, [user]);
+
+  const submit = async () => {
+    if (password.length < 8) {
+      toast.error("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    setBusy(true);
+    await onReset(password);
+    setBusy(false);
+  };
+
+  return (
+    <Dialog open={!!user} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Restablecer contraseña</DialogTitle>
+          <DialogDescription>
+            {user
+              ? `Define una nueva contraseña para "${user.nombre}". La cuenta podrá iniciar sesión inmediatamente con la nueva contraseña.`
+              : ""}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label>Nueva contraseña *</Label>
+          <Input
+            type="text"
+            value={password}
+            maxLength={72}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Mínimo 8 caracteres"
+            autoFocus
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
+            Cancelar
+          </Button>
+          <Button onClick={submit} disabled={busy}>
+            {busy ? "Actualizando..." : "Actualizar contraseña"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
