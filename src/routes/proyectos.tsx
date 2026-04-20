@@ -261,7 +261,7 @@ function Inner() {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar proyecto" : "Nuevo proyecto"}</DialogTitle>
             <DialogDescription>El código identifica al proyecto (ej. 19530).</DialogDescription>

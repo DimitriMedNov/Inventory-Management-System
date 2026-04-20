@@ -191,7 +191,7 @@ function Inner() {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar ubicación" : "Nueva ubicación"}</DialogTitle>
             <DialogDescription>Indica un nombre claro (ej. "Estante A1", "Bodega 2").</DialogDescription>
