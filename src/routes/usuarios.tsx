@@ -67,6 +67,7 @@ function Inner() {
   const [pendingActivo, setPendingActivo] = useState<{ user: ProfileRow; nuevo: boolean } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const createUserFn = useServerFn(createUserAdmin);
+  const setActivoFn = useServerFn(setUserActivoAdmin);
 
   const load = useCallback(async () => {
     const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
