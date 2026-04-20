@@ -227,7 +227,7 @@ function Inner() {
             <div key={p.id} className="rounded-lg border border-border bg-card p-4 flex flex-col">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="font-mono text-[10px] text-muted-foreground">{p.sku}</div>
-                {sinStock && <span className="text-xs text-destructive font-medium">Sin disponible</span>}
+                {sinStock && <span className="text-xs text-destructive font-medium">{/a\s*$/i.test(p.nombre.split(" ")[0]) ? "Agotada" : "Agotado"}</span>}
                 {bajo && <span className="inline-flex items-center gap-1 text-xs text-warning-foreground"><AlertTriangle className="h-3 w-3" />Bajo</span>}
               </div>
               <div className="font-semibold mb-1">{p.nombre}</div>
