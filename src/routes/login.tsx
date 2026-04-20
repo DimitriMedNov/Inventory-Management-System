@@ -39,7 +39,7 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen w-full grid lg:grid-cols-2">
-      {/* Panel izquierdo branding Diprolam */}
+      {/* Branding Diprolam */}
       <div className="hidden lg:flex flex-col items-center justify-center bg-sidebar text-sidebar-foreground p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
         <div className="relative flex flex-col items-center gap-6">
