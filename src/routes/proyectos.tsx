@@ -147,7 +147,8 @@ function Inner() {
         <div className="p-4 border-b border-border flex items-center gap-2 text-sm text-muted-foreground">
           <Briefcase className="h-4 w-4" /> {filtered.length} proyecto{filtered.length === 1 ? "" : "s"}
         </div>
-        <div className="overflow-x-auto">
+        {/* Tabla desktop */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr className="text-left">
@@ -209,16 +210,64 @@ function Inner() {
             </tbody>
           </table>
         </div>
+
+        {/* Cards móvil */}
+        <div className="md:hidden divide-y divide-border">
+          {filtered.map((p) => {
+            const count = p.solicitudes?.[0]?.count ?? 0;
+            return (
+              <div key={p.id} className="p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-mono text-sm">{p.codigo}</span>
+                      {p.activo
+                        ? <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-medium"><CheckCircle2 className="h-3 w-3" /> Activo</span>
+                        : <span className="inline-flex items-center gap-1 rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px] font-medium"><XCircle className="h-3 w-3" /> Terminado</span>}
+                    </div>
+                    <div className="font-medium truncate">{p.nombre}</div>
+                    {p.descripcion && <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{p.descripcion}</div>}
+                    <div className="text-xs text-muted-foreground mt-1">{count} solicitud{count === 1 ? "" : "es"}</div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Button size="sm" variant="outline" asChild className="flex-1 min-w-[80px]">
+                    <Link to="/proyectos/$id" params={{ id: p.id }}>
+                      <Eye className="h-3.5 w-3.5 mr-1" /> Ver
+                    </Link>
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => startEdit(p)} className="flex-1 min-w-[80px]">
+                    <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => toggleActivo(p)} className="flex-1 min-w-[80px]">
+                    {p.activo ? <><XCircle className="h-3.5 w-3.5 mr-1" /> Cerrar</> : <><CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Reactivar</>}
+                  </Button>
+                  <Button
+                    size="sm" variant="outline"
+                    className="text-destructive hover:text-destructive flex-1 min-w-[80px]"
+                    onClick={() => setConfirmDel(p)}
+                    disabled={count > 0}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Borrar
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="p-8 text-center text-muted-foreground text-sm">Sin proyectos en este filtro.</div>
+          )}
+        </div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar proyecto" : "Nuevo proyecto"}</DialogTitle>
             <DialogDescription>El código identifica al proyecto (ej. 19530).</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="col-span-1">
                 <Label>Código *</Label>
                 <Input value={form.codigo} maxLength={40} placeholder="19530"

@@ -110,7 +110,8 @@ function Inner() {
         <div className="p-4 border-b border-border flex items-center gap-2 text-sm text-muted-foreground">
           <Tags className="h-4 w-4" /> {items.length} categorías registradas
         </div>
-        <div className="overflow-x-auto">
+        {/* Tabla desktop */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr className="text-left">
@@ -153,10 +154,44 @@ function Inner() {
             </tbody>
           </table>
         </div>
+
+        {/* Cards móvil */}
+        <div className="md:hidden divide-y divide-border">
+          {items.map((c) => {
+            const count = c.productos?.[0]?.count ?? 0;
+            return (
+              <div key={c.id} className="p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{c.nombre}</div>
+                    {c.descripcion && <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{c.descripcion}</div>}
+                    <div className="text-xs text-muted-foreground mt-1">{count} producto{count === 1 ? "" : "s"}</div>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <Button size="sm" variant="outline" onClick={() => startEdit(c)} className="h-9 w-9 p-0">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm" variant="outline"
+                      className="text-destructive hover:text-destructive h-9 w-9 p-0"
+                      onClick={() => setConfirmDel(c)}
+                      disabled={count > 0}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {items.length === 0 && (
+            <div className="p-8 text-center text-muted-foreground text-sm">No hay categorías. Crea la primera.</div>
+          )}
+        </div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar categoría" : "Nueva categoría"}</DialogTitle>
             <DialogDescription>Define un nombre claro y opcionalmente una descripción.</DialogDescription>

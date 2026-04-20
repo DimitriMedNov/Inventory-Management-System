@@ -85,7 +85,8 @@ function Inner() {
         actions={<Button onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1" /> Nuevo movimiento</Button>}
       />
 
-      <div className="rounded-lg border border-border bg-card overflow-x-auto">
+      {/* Tabla desktop */}
+      <div className="rounded-lg border border-border bg-card hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
             <tr className="text-left">
@@ -119,6 +120,50 @@ function Inner() {
         </table>
       </div>
 
+      {/* Cards móvil */}
+      <div className="md:hidden rounded-lg border border-border bg-card divide-y divide-border">
+        {movs.map((m) => (
+          <div key={m.id} className="p-4 space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="font-medium truncate">{m.productos?.nombre ?? "—"}</div>
+                <div className="font-mono text-[11px] text-muted-foreground">{m.productos?.sku}</div>
+              </div>
+              <StatusBadge status={m.tipo} />
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <div className="text-muted-foreground">Cantidad</div>
+                <div className="font-semibold">{m.cantidad} {m.productos?.unidad_medida}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Fecha</div>
+                <div>{fmtDateTime(m.fecha)}</div>
+              </div>
+              {m.motivo && (
+                <div className="col-span-2">
+                  <div className="text-muted-foreground">Motivo</div>
+                  <div>{m.motivo}</div>
+                </div>
+              )}
+              {m.referencia && (
+                <div>
+                  <div className="text-muted-foreground">Referencia</div>
+                  <div>{m.referencia}</div>
+                </div>
+              )}
+              <div>
+                <div className="text-muted-foreground">Responsable</div>
+                <div className="truncate">{m.profiles?.nombre ?? "—"}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {movs.length === 0 && (
+          <div className="p-8 text-center text-muted-foreground text-sm">Sin movimientos.</div>
+        )}
+      </div>
+
       <MovDialog open={open} onOpenChange={setOpen} productos={productos} onSave={onSave} />
     </>
   );
@@ -139,10 +184,10 @@ function MovDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Registrar movimiento</DialogTitle></DialogHeader>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
             <Label>Producto</Label>
             <Select value={form.producto_id} onValueChange={(v) => setForm({ ...form, producto_id: v })}>
               <SelectTrigger><SelectValue placeholder="Seleccionar producto" /></SelectTrigger>
@@ -175,12 +220,12 @@ function MovDialog({
             <Label>Referencia</Label>
             <Input value={form.referencia} onChange={(e) => setForm({ ...form, referencia: e.target.value })} placeholder="Factura, orden..." />
           </div>
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <Label>Motivo</Label>
             <Textarea rows={2} value={form.motivo} onChange={(e) => setForm({ ...form, motivo: e.target.value })} placeholder="Compra, devolución, conteo físico..." />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button
             onClick={() => onSave(form)}
