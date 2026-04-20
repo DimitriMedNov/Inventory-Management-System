@@ -18,9 +18,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
-import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX, Plus } from "lucide-react";
+import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX, Plus, KeyRound } from "lucide-react";
 import { toast } from "sonner";
-import { createUserAdmin, setUserActivoAdmin } from "@/utils/users.functions";
+import { createUserAdmin, setUserActivoAdmin, resetUserPasswordAdmin } from "@/utils/users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
