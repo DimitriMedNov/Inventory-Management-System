@@ -452,3 +452,64 @@ function CreateUserDialog({
   );
 }
 
+function ResetPasswordDialog({
+  user,
+  onOpenChange,
+  onReset,
+}: {
+  user: ProfileRow | null;
+  onOpenChange: (open: boolean) => void;
+  onReset: (password: string) => Promise<boolean>;
+}) {
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (user) setPassword("");
+  }, [user]);
+
+  const submit = async () => {
+    if (password.length < 8) {
+      toast.error("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    setBusy(true);
+    await onReset(password);
+    setBusy(false);
+  };
+
+  return (
+    <Dialog open={!!user} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Restablecer contraseña</DialogTitle>
+          <DialogDescription>
+            {user
+              ? `Define una nueva contraseña para "${user.nombre}". La cuenta podrá iniciar sesión inmediatamente con la nueva contraseña.`
+              : ""}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label>Nueva contraseña *</Label>
+          <Input
+            type="text"
+            value={password}
+            maxLength={72}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Mínimo 8 caracteres"
+            autoFocus
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
+            Cancelar
+          </Button>
+          <Button onClick={submit} disabled={busy}>
+            {busy ? "Actualizando..." : "Actualizar contraseña"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
