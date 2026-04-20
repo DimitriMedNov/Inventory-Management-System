@@ -66,8 +66,10 @@ function Inner() {
   const [search, setSearch] = useState("");
   const [pendingActivo, setPendingActivo] = useState<{ user: ProfileRow; nuevo: boolean } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [pendingResetUser, setPendingResetUser] = useState<ProfileRow | null>(null);
   const createUserFn = useServerFn(createUserAdmin);
   const setActivoFn = useServerFn(setUserActivoAdmin);
+  const resetPasswordFn = useServerFn(resetUserPasswordAdmin);
 
   const load = useCallback(async () => {
     const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
