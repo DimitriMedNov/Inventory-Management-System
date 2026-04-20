@@ -304,6 +304,36 @@ function Inner() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ResetPasswordDialog
+        user={pendingResetUser}
+        onOpenChange={(o) => !o && setPendingResetUser(null)}
+        onReset={async (password) => {
+          if (!pendingResetUser) return false;
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+              toast.error("Sesión expirada. Inicia sesión de nuevo.");
+              return false;
+            }
+            const res = await resetPasswordFn({
+              data: { user_id: pendingResetUser.id, password },
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            if (!res.ok) {
+              toast.error(res.error || "No se pudo restablecer la contraseña");
+              return false;
+            }
+            toast.success(`Contraseña actualizada para ${pendingResetUser.nombre}`);
+            setPendingResetUser(null);
+            return true;
+          } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : "Error al restablecer contraseña";
+            toast.error(msg);
+            return false;
+          }
+        }}
+      />
     </>
   );
 }
