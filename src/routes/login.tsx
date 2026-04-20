@@ -39,45 +39,30 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen w-full grid lg:grid-cols-2">
-      {/* Panel izquierdo branding */}
-      <div className="hidden lg:flex flex-col justify-between bg-primary text-primary-foreground p-12">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-md bg-white/15 flex items-center justify-center">
-            <Boxes className="h-6 w-6" />
+      {/* Panel izquierdo branding Diprolam */}
+      <div className="hidden lg:flex flex-col items-center justify-center bg-sidebar text-sidebar-foreground p-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
+        <div className="relative flex flex-col items-center gap-6">
+          <div className="h-32 w-32 rounded-2xl bg-white flex items-center justify-center p-4 shadow-xl">
+            <img src={diprolamIcon} alt="Diprolam" className="h-full w-full object-contain" />
           </div>
-          <div>
-            <div className="font-semibold">Inventario Taller</div>
-            <div className="text-xs text-primary-foreground/70">Sistema empresarial</div>
+          <img src={diprolamLogo} alt="Diprolam Bjx" className="h-14 object-contain brightness-0 invert" />
+          <div className="text-sm text-sidebar-foreground/70 tracking-wide uppercase">
+            Sistema de inventario interno
           </div>
         </div>
-        <div className="space-y-6 max-w-md">
-          <h1 className="text-4xl font-semibold leading-tight">
-            Control total de tu almacén,<br />en una sola plataforma.
-          </h1>
-          <p className="text-primary-foreground/80 leading-relaxed">
-            Gestiona herramientas, materiales y refacciones. Aprueba solicitudes internas,
-            registra entradas y salidas, y mantén tu inventario actualizado en tiempo real.
-          </p>
-          <ul className="space-y-2 text-sm text-primary-foreground/80">
-            <li>• Tres roles: administrador, almacén y solicitante</li>
-            <li>• Descuento automático de stock al entregar</li>
-            <li>• Historial completo de movimientos</li>
-            <li>• Alertas de stock mínimo</li>
-          </ul>
-        </div>
-        <div className="text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} Inventario Taller — Plataforma interna
+        <div className="absolute bottom-6 text-[11px] text-sidebar-foreground/40">
+          © {new Date().getFullYear()} Diprolam Bjx
         </div>
       </div>
 
       {/* Formulario */}
       <div className="flex items-center justify-center p-6 lg:p-12 bg-background">
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="h-9 w-9 rounded-md bg-primary flex items-center justify-center text-primary-foreground">
-              <Boxes className="h-5 w-5" />
+          <div className="lg:hidden flex flex-col items-center gap-3 mb-8">
+            <div className="h-16 w-16 rounded-xl bg-sidebar flex items-center justify-center p-2">
+              <img src={diprolamIcon} alt="Diprolam" className="h-full w-full object-contain" />
             </div>
-            <div className="font-semibold">Inventario Taller</div>
           </div>
 
           <h2 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h2>
