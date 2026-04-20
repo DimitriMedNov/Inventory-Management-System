@@ -160,7 +160,8 @@ function Inner() {
           <div className="text-sm text-muted-foreground ml-auto">{filtered.length} usuarios</div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Tabla desktop */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr className="text-left">
@@ -248,6 +249,84 @@ function Inner() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Cards móvil */}
+        <div className="md:hidden divide-y divide-border">
+          {filtered.map((u) => {
+            const role = roles.get(u.id) ?? "solicitante";
+            const RoleIcon = ROLE_ICON[role];
+            const isMe = currentUser?.id === u.id;
+            return (
+              <div key={u.id} className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">
+                      {u.nombre}
+                      {isMe && <span className="ml-2 text-xs text-muted-foreground">(tú)</span>}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">{u.correo}</div>
+                    {u.area && <div className="text-xs text-muted-foreground truncate">{u.area}</div>}
+                  </div>
+                  {u.activo ? (
+                    <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success border border-success/30">
+                      Activo
+                    </span>
+                  ) : (
+                    <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+                      Inactivo
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <Label className="text-[11px] text-muted-foreground mb-1 block">Rol</Label>
+                  <div className="flex items-center gap-2">
+                    <RoleIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <Select
+                      value={role}
+                      onValueChange={(v) => changeRole(u, v as AppRole)}
+                      disabled={isMe}
+                    >
+                      <SelectTrigger className="h-9 flex-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                        <SelectItem value="almacen">Encargado de almacén</SelectItem>
+                        <SelectItem value="solicitante">Solicitante</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setPendingResetUser(u)}
+                    className="flex-1 min-w-[140px]"
+                  >
+                    <KeyRound className="h-3.5 w-3.5 mr-1" /> Contraseña
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isMe}
+                    onClick={() => setPendingActivo({ user: u, nuevo: !u.activo })}
+                    className={`flex-1 min-w-[140px] ${u.activo ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}`}
+                  >
+                    {u.activo ? (
+                      <><UserX className="h-3.5 w-3.5 mr-1" /> Desactivar</>
+                    ) : (
+                      <><UserCheck className="h-3.5 w-3.5 mr-1" /> Activar</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="p-8 text-center text-muted-foreground text-sm">No hay usuarios.</div>
+          )}
         </div>
       </div>
 
@@ -387,15 +466,15 @@ function CreateUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Crear nuevo usuario</DialogTitle>
           <DialogDescription>
             La cuenta quedará activa y con email confirmado. Podrá iniciar sesión inmediatamente.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
             <Label>Nombre completo *</Label>
             <Input
               value={form.nombre}
@@ -443,7 +522,7 @@ function CreateUserDialog({
             </Select>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>Cancelar</Button>
           <Button onClick={submit} disabled={busy}>{busy ? "Creando..." : "Crear usuario"}</Button>
         </DialogFooter>
