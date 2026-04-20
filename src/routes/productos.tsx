@@ -116,7 +116,8 @@ function Inner() {
           <div className="text-sm text-muted-foreground ml-auto">{filtered.length} productos</div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Tabla desktop */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr className="text-left">
@@ -168,6 +169,57 @@ function Inner() {
             </tbody>
           </table>
         </div>
+
+        {/* Cards móvil */}
+        <div className="md:hidden divide-y divide-border">
+          {filtered.map((p) => {
+            const bajo = Number(p.stock_actual) <= Number(p.stock_minimo);
+            return (
+              <div key={p.id} className="p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{p.nombre}</div>
+                    <div className="font-mono text-[11px] text-muted-foreground">{p.sku}</div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }} className="shrink-0 h-9 w-9 p-0">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <div className="text-muted-foreground">Stock</div>
+                    <div className="font-semibold">{p.stock_actual} {p.unidad_medida} <span className="text-muted-foreground font-normal">/ mín {p.stock_minimo}</span></div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Ubicación</div>
+                    <div className="font-medium truncate">{p.ubicaciones?.nombre ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Categoría</div>
+                    <div className="font-medium truncate">{p.categorias?.nombre ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Estado</div>
+                    <div>
+                      {!p.activo ? (
+                        <span className="text-xs text-muted-foreground">Inactivo</span>
+                      ) : bajo ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-destructive font-medium">
+                          <AlertTriangle className="h-3 w-3" /> Stock bajo
+                        </span>
+                      ) : (
+                        <span className="text-xs text-success font-medium">OK</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="p-8 text-center text-muted-foreground text-sm">No hay productos. Crea el primero.</div>
+          )}
+        </div>
       </div>
 
       <ProductoDialog
@@ -199,11 +251,11 @@ function ProductoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editing ? "Editar producto" : "Nuevo producto"}</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label>SKU / Código interno</Label>
             <Input value={form.sku ?? ""} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
@@ -212,7 +264,7 @@ function ProductoDialog({
             <Label>Nombre</Label>
             <Input value={form.nombre ?? ""} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
           </div>
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <Label>Descripción</Label>
             <Textarea rows={2} value={form.descripcion ?? ""} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
           </div>
@@ -251,12 +303,12 @@ function ProductoDialog({
             <Label>Stock mínimo</Label>
             <Input type="number" min={0} value={form.stock_minimo ?? 0} onChange={(e) => setForm({ ...form, stock_minimo: Number(e.target.value) })} />
           </div>
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <Label>Observaciones</Label>
             <Textarea rows={2} value={form.observaciones ?? ""} onChange={(e) => setForm({ ...form, observaciones: e.target.value })} />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={() => onSave(form)}>{editing ? "Guardar cambios" : "Crear producto"}</Button>
         </DialogFooter>
