@@ -87,14 +87,14 @@ function DashboardInner() {
 
       {/* Cards de métricas */}
       {role === "solicitante" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-6">
           <StatCard label="Mis solicitudes pendientes" value={stats?.misPendientes ?? "—"} icon={ClipboardList} tone="warning" />
           <StatCard label="Mis entregadas" value={stats?.misEntregadas ?? "—"} icon={CheckCircle2} tone="success" />
           <StatCard label="Productos disponibles" value={stats?.totalProductos ?? "—"} icon={Package} tone="info" />
           <StatCard label="Stock bajo" value={stats?.stockBajo ?? "—"} icon={AlertTriangle} tone="destructive" hint="Artículos por debajo del mínimo" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-6">
           <StatCard label="Productos" value={stats?.totalProductos ?? "—"} icon={Package} tone="info" />
           <StatCard label="Stock bajo" value={stats?.stockBajo ?? "—"} icon={AlertTriangle} tone="destructive" />
           <StatCard label="Pendientes" value={stats?.pendientes ?? "—"} icon={ClipboardList} tone="warning" />
@@ -108,14 +108,14 @@ function DashboardInner() {
         {/* Movimientos recientes */}
         {role !== "solicitante" && (
           <div className="rounded-lg border border-border bg-card">
-            <div className="px-5 py-4 border-b border-border">
+            <div className="px-4 md:px-5 py-4 border-b border-border">
               <h3 className="font-semibold">Movimientos recientes</h3>
               <p className="text-xs text-muted-foreground">Últimas entradas, salidas y ajustes</p>
             </div>
             <div className="divide-y divide-border">
               {movs.length === 0 && <p className="p-5 text-sm text-muted-foreground">Sin movimientos registrados.</p>}
               {movs.map((m) => (
-                <div key={m.id} className="px-5 py-3 flex items-center justify-between">
+                <div key={m.id} className="px-4 md:px-5 py-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-3">
                     <div className={`h-8 w-8 rounded-md flex items-center justify-center ${m.tipo === "entrada" ? "bg-success/10 text-success" : m.tipo === "salida" ? "bg-destructive/10 text-destructive" : "bg-info/10 text-info"}`}>
                       {m.tipo === "entrada" ? <ArrowDown className="h-4 w-4" /> : m.tipo === "salida" ? <ArrowUp className="h-4 w-4" /> : <ArrowUp className="h-4 w-4" />}
@@ -137,14 +137,14 @@ function DashboardInner() {
 
         {/* Solicitudes recientes */}
         <div className="rounded-lg border border-border bg-card">
-          <div className="px-5 py-4 border-b border-border">
+          <div className="px-4 md:px-5 py-4 border-b border-border">
             <h3 className="font-semibold">Solicitudes recientes</h3>
             <p className="text-xs text-muted-foreground">Últimas solicitudes registradas</p>
           </div>
           <div className="divide-y divide-border">
             {recientes.length === 0 && <p className="p-5 text-sm text-muted-foreground">Sin solicitudes.</p>}
             {recientes.map((s) => (
-              <div key={s.id} className="px-5 py-3 flex items-center justify-between">
+              <div key={s.id} className="px-4 md:px-5 py-3 flex items-center justify-between gap-2">
                 <div>
                   <div className="text-sm font-medium">Folio #{s.folio} · {s.profiles?.nombre ?? ""}</div>
                   <div className="text-xs text-muted-foreground">{fmtDateTime(s.fecha_solicitud)}</div>
