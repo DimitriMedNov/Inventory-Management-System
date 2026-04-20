@@ -47,8 +47,8 @@ function LoginPage() {
             <img src={diprolamIcon} alt="Diprolam" className="h-full w-full object-contain" />
           </div>
           <img src={diprolamLogo} alt="Diprolam Bjx" className="h-14 object-contain brightness-0 invert" />
-          <div className="text-sm text-sidebar-foreground/70 tracking-wide uppercase">
-            Sistema de inventario interno
+          <div className="text-sm text-sidebar-foreground/70 tracking-wide uppercase font-bold">
+            Sistema de inventario
           </div>
         </div>
         <div className="absolute bottom-6 text-[11px] text-sidebar-foreground/40">
