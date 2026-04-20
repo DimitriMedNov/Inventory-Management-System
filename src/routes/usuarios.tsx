@@ -252,7 +252,7 @@ function Inner() {
       </div>
 
       <p className="text-xs text-muted-foreground mt-3">
-        Nota: no puedes cambiar tu propio rol ni desactivar tu propia cuenta.
+        Nota: no puedes cambiar tu propio rol ni desactivar tu propia cuenta. Sí puedes restablecer tu propia contraseña.
       </p>
 
       <CreateUserDialog
