@@ -187,7 +187,8 @@ function Inner() {
         </TabsList>
       </Tabs>
 
-      <div className="rounded-lg border border-border bg-card overflow-x-auto">
+      {/* Tabla desktop */}
+      <div className="rounded-lg border border-border bg-card overflow-x-auto hidden md:block">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
             <tr className="text-left">
@@ -235,6 +236,46 @@ function Inner() {
         </table>
       </div>
 
+      {/* Cards móvil */}
+      <div className="md:hidden rounded-lg border border-border bg-card divide-y divide-border">
+        {filtered.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => openDetail(s)}
+            className="w-full text-left p-4 hover:bg-muted/30 active:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="font-mono text-sm font-semibold">#{s.folio}</div>
+              <StatusBadge status={s.estatus} />
+            </div>
+            <div className="font-medium text-sm truncate">{s.profiles?.nombre ?? "—"}</div>
+            {s.profiles?.area && <div className="text-xs text-muted-foreground truncate">{s.profiles.area}</div>}
+            {s.proyectos && (
+              <div className="text-xs mt-1">
+                <span className="font-mono text-muted-foreground">{s.proyectos.codigo}</span>
+                <span className="text-muted-foreground"> — </span>
+                <span className="truncate">{s.proyectos.nombre}</span>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground mt-2">
+              <div>
+                <div>Solicitada</div>
+                <div className="text-foreground">{fmtDateTime(s.fecha_solicitud)}</div>
+              </div>
+              <div>
+                <div>Requerida</div>
+                <div className="text-foreground">{fmtDate(s.fecha_requerida)}</div>
+              </div>
+            </div>
+          </button>
+        ))}
+        {filtered.length === 0 && (
+          <div className="p-8 text-center text-muted-foreground text-sm">
+            {enHistorial ? "Aún no hay solicitudes cerradas." : "Sin solicitudes activas en este filtro."}
+          </div>
+        )}
+      </div>
+
       <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           {detail && (
@@ -245,9 +286,9 @@ function Inner() {
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
                 {detail.proyectos && (
-                  <div className="col-span-2 rounded-md bg-primary/5 border border-primary/20 p-2">
+                  <div className="sm:col-span-2 rounded-md bg-primary/5 border border-primary/20 p-2">
                     <div className="text-xs text-muted-foreground">Proyecto</div>
                     <div className="font-medium font-mono text-sm">{detail.proyectos.codigo} — <span className="font-sans">{detail.proyectos.nombre}</span></div>
                   </div>
@@ -259,9 +300,9 @@ function Inner() {
                 {detail.fecha_autorizacion && <div><div className="text-xs text-muted-foreground">Fecha autorización</div><div>{fmtDateTime(detail.fecha_autorizacion)}</div></div>}
                 {detail.fecha_lista && <div><div className="text-xs text-muted-foreground">Lista para recoger</div><div>{fmtDateTime(detail.fecha_lista)}</div></div>}
                 {detail.fecha_entrega && <div><div className="text-xs text-muted-foreground">Fecha entrega</div><div>{fmtDateTime(detail.fecha_entrega)}</div></div>}
-                {detail.comentarios_usuario && <div className="col-span-2"><div className="text-xs text-muted-foreground">Comentarios del solicitante</div><div className="whitespace-pre-wrap">{detail.comentarios_usuario}</div></div>}
-                {detail.comentarios_admin && <div className="col-span-2"><div className="text-xs text-muted-foreground">Comentarios del administrador</div><div>{detail.comentarios_admin}</div></div>}
-                {detail.comentarios_almacen && <div className="col-span-2"><div className="text-xs text-muted-foreground">Comentarios de almacén</div><div>{detail.comentarios_almacen}</div></div>}
+                {detail.comentarios_usuario && <div className="sm:col-span-2"><div className="text-xs text-muted-foreground">Comentarios del solicitante</div><div className="whitespace-pre-wrap">{detail.comentarios_usuario}</div></div>}
+                {detail.comentarios_admin && <div className="sm:col-span-2"><div className="text-xs text-muted-foreground">Comentarios del administrador</div><div>{detail.comentarios_admin}</div></div>}
+                {detail.comentarios_almacen && <div className="sm:col-span-2"><div className="text-xs text-muted-foreground">Comentarios de almacén</div><div>{detail.comentarios_almacen}</div></div>}
               </div>
 
               <div className="rounded-md border border-border overflow-hidden mb-4">
