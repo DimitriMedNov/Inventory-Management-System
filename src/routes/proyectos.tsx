@@ -267,7 +267,7 @@ function Inner() {
             <DialogDescription>El código identifica al proyecto (ej. 19530).</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="col-span-1">
                 <Label>Código *</Label>
                 <Input value={form.codigo} maxLength={40} placeholder="19530"
