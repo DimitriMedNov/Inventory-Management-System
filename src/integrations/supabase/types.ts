@@ -449,6 +449,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_user: { Args: never; Returns: boolean }
       marcar_lista_solicitud: {
         Args: { _comentarios?: string; _entregas: Json; _solicitud_id: string }
         Returns: {

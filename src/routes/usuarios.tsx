@@ -20,7 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth-context";
 import { Search, ShieldCheck, Boxes, Wrench, UserCheck, UserX, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { createUserAdmin } from "@/utils/users.functions";
+import { createUserAdmin, setUserActivoAdmin } from "@/utils/users.functions";
 
 export const Route = createFileRoute("/usuarios")({
   component: UsuariosPage,
@@ -67,6 +67,7 @@ function Inner() {
   const [pendingActivo, setPendingActivo] = useState<{ user: ProfileRow; nuevo: boolean } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const createUserFn = useServerFn(createUserAdmin);
+  const setActivoFn = useServerFn(setUserActivoAdmin);
 
   const load = useCallback(async () => {
     const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
@@ -107,12 +108,26 @@ function Inner() {
   const toggleActivo = async () => {
     if (!pendingActivo) return;
     const { user: u, nuevo } = pendingActivo;
-    const { error } = await supabase.rpc("set_user_activo", { _user_id: u.id, _activo: nuevo });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success(nuevo ? "Cuenta activada" : "Cuenta desactivada");
-      setProfiles((prev) => prev.map((p) => (p.id === u.id ? { ...p, activo: nuevo } : p)));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Sesión expirada. Inicia sesión de nuevo.");
+        setPendingActivo(null);
+        return;
+      }
+      const res = await setActivoFn({
+        data: { user_id: u.id, activo: nuevo },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) {
+        toast.error(res.error || "No se pudo actualizar el estado");
+      } else {
+        toast.success(nuevo ? "Cuenta activada" : "Cuenta desactivada y bloqueada");
+        setProfiles((prev) => prev.map((p) => (p.id === u.id ? { ...p, activo: nuevo } : p)));
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Error al actualizar estado";
+      toast.error(msg);
     }
     setPendingActivo(null);
   };
