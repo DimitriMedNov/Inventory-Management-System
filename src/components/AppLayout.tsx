@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import diprolamIcon from "@/assets/diprolam-icon.png";
+import diprolamLogo from "@/assets/diprolam-logo.png";
 
 interface NavItem {
   to: string;
@@ -70,12 +71,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
         className="hidden md:flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border"
         style={{ width: "var(--sidebar-width)" }}
       >
-        <div className="flex items-center gap-2 px-5 border-b border-sidebar-border" style={{ height: "var(--header-height)" }}>
-          <img src={diprolamIcon} alt="Diprolam" className="h-9 w-9 rounded-md bg-white p-1" />
-          <div className="leading-tight">
-            <div className="font-semibold text-sm">Diprolam Bjx</div>
-            <div className="text-[11px] text-sidebar-foreground/70">Inventario interno</div>
-          </div>
+        <div className="flex items-center gap-3 px-5 border-b border-sidebar-border bg-white/5" style={{ height: "var(--header-height)" }}>
+          <img src={diprolamIcon} alt="Diprolam" className="h-10 w-10 rounded-md bg-white p-1 shrink-0" />
+          <img src={diprolamLogo} alt="Diprolam Bjx" className="h-6 object-contain brightness-0 invert opacity-90" />
         </div>
 
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
