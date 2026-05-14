@@ -1,0 +1,13 @@
+# InventarioPro
+
+> Plataforma multi-empresa de inventario, solicitudes y movimientos de almacén con análisis de IA.
+
+## Pages
+
+- [Inicio](/): Login y entrada a la plataforma.
+- [Panel principal](/dashboard): Resumen de inventario y actividad reciente.
+- [Productos](/productos): Catálogo de productos por empresa.
+- [Movimientos](/movimientos): Histórico de entradas, salidas y ajustes.
+- [Análisis IA](/analisis-ia): Recomendaciones automáticas de recompra y proyección de agotamiento.
+- [Solicitudes](/solicitudes): Flujo de pedidos entre roles.
+- [Inventario](/inventario): Vista consolidada por ubicación y categoría.
