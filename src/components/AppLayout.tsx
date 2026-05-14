@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import diprolamIcon from "@/assets/diprolam-icon.png";
-import diprolamLogo from "@/assets/diprolam-logo.png";
 
 interface NavItem {
   to: string;
@@ -56,10 +54,13 @@ const ROLE_ICON: Record<AppRole, typeof ShieldCheck> = {
 };
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { profile, role, signOut } = useAuth();
+  const { profile, role, signOut, empresa } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const empresaNombre = empresa?.nombre ?? "InventaPro";
+  const empresaLogo = empresa?.logo_url ?? null;
 
   const visible = NAV.filter((n) => role && n.roles.includes(role));
   const RoleIcon = role ? ROLE_ICON[role] : ShieldCheck;
@@ -103,8 +104,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
       className="flex items-center gap-3 px-5 border-b border-sidebar-border bg-white/5"
       style={{ height: "var(--header-height)" }}
     >
-      <img src={diprolamIcon} alt="Diprolam" className="h-10 w-10 rounded-md bg-white p-1 shrink-0" />
-      <img src={diprolamLogo} alt="Diprolam Bjx" className="h-6 object-contain brightness-0 invert opacity-90" />
+      {empresaLogo ? (
+        <img src={empresaLogo} alt={empresaNombre} className="h-10 w-10 rounded-md bg-white p-1 shrink-0 object-contain" />
+      ) : (
+        <div className="h-10 w-10 rounded-md bg-white flex items-center justify-center shrink-0">
+          <Boxes className="h-7 w-7 text-primary" strokeWidth={1.5} />
+        </div>
+      )}
+      <div className="text-base font-semibold tracking-tight truncate">{empresaNombre}</div>
     </div>
   );
 
@@ -160,7 +167,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </Sheet>
 
             <div className="min-w-0">
-              <div className="hidden sm:block text-xs text-muted-foreground">Diprolam Bjx</div>
+              <div className="hidden sm:block text-xs text-muted-foreground">{empresaNombre}</div>
               <div className="text-sm font-semibold truncate">{currentTitle(location.pathname)}</div>
             </div>
           </div>
