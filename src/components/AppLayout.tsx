@@ -104,8 +104,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
       className="flex items-center gap-3 px-5 border-b border-sidebar-border bg-white/5"
       style={{ height: "var(--header-height)" }}
     >
-      <img src={diprolamIcon} alt="Diprolam" className="h-10 w-10 rounded-md bg-white p-1 shrink-0" />
-      <img src={diprolamLogo} alt="Diprolam Bjx" className="h-6 object-contain brightness-0 invert opacity-90" />
+      {empresaLogo ? (
+        <img src={empresaLogo} alt={empresaNombre} className="h-10 w-10 rounded-md bg-white p-1 shrink-0 object-contain" />
+      ) : (
+        <div className="h-10 w-10 rounded-md bg-white flex items-center justify-center shrink-0">
+          <Boxes className="h-7 w-7 text-primary" strokeWidth={1.5} />
+        </div>
+      )}
+      <div className="text-base font-semibold tracking-tight truncate">{empresaNombre}</div>
     </div>
   );
 
