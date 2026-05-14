@@ -167,7 +167,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </Sheet>
 
             <div className="min-w-0">
-              <div className="hidden sm:block text-xs text-muted-foreground">Diprolam Bjx</div>
+              <div className="hidden sm:block text-xs text-muted-foreground">{empresaNombre}</div>
               <div className="text-sm font-semibold truncate">{currentTitle(location.pathname)}</div>
             </div>
           </div>
