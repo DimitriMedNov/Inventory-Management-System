@@ -38,6 +38,7 @@ function CategoriasPage() {
 }
 
 function Inner() {
+  const { empresaId } = useAuth();
   const [items, setItems] = useState<Categoria[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Categoria | null>(null);

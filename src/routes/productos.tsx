@@ -43,7 +43,7 @@ function ProductosPage() {
 }
 
 function Inner() {
-  const { user } = useAuth();
+  const { user, empresaId } = useAuth();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<{ id: string; nombre: string }[]>([]);
   const [ubicaciones, setUbicaciones] = useState<{ id: string; nombre: string }[]>([]);
