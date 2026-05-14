@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import diprolamIcon from "@/assets/diprolam-icon.png";
-import diprolamLogo from "@/assets/diprolam-logo.png";
 
 interface NavItem {
   to: string;
