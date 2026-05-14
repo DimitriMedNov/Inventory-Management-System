@@ -16,6 +16,7 @@ import {
   Warehouse,
   Briefcase,
   Menu,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -31,6 +32,7 @@ const NAV: NavItem[] = [
   { to: "/dashboard", label: "Panel principal", icon: LayoutDashboard, roles: ["admin", "almacen", "solicitante"] },
   { to: "/productos", label: "Productos", icon: Package, roles: ["admin", "almacen"] },
   { to: "/movimientos", label: "Movimientos", icon: ArrowLeftRight, roles: ["admin", "almacen"] },
+  { to: "/analisis-ia", label: "Análisis IA", icon: Sparkles, roles: ["admin", "almacen"] },
   { to: "/solicitudes", label: "Solicitudes", icon: ClipboardList, roles: ["admin", "almacen", "solicitante"] },
   { to: "/catalogo", label: "Inventario", icon: Warehouse, roles: ["solicitante", "admin", "almacen"] },
   { to: "/categorias", label: "Categorías", icon: Tags, roles: ["admin", "almacen"] },
@@ -194,6 +196,7 @@ function currentTitle(path: string) {
   if (path.startsWith("/dashboard")) return "Panel principal";
   if (path.startsWith("/productos")) return "Productos";
   if (path.startsWith("/movimientos")) return "Movimientos de inventario";
+  if (path.startsWith("/analisis-ia")) return "Análisis IA de inventario";
   if (path.startsWith("/solicitudes")) return "Solicitudes internas";
   if (path.startsWith("/catalogo")) return "Inventario disponible";
   if (path.startsWith("/categorias")) return "Categorías";
