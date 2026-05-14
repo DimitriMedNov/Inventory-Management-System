@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import diprolamLogo from "@/assets/diprolam-logo.png";
-import diprolamIcon from "@/assets/diprolam-icon.png";
+import { Boxes } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -39,30 +38,29 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen w-full grid lg:grid-cols-2">
-      {/* Branding Diprolam */}
       <div className="hidden lg:flex flex-col items-center justify-center bg-sidebar text-sidebar-foreground p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
         <div className="relative flex flex-col items-center gap-6">
           <div className="h-32 w-32 rounded-2xl bg-white flex items-center justify-center p-4 shadow-xl">
-            <img src={diprolamIcon} alt="Diprolam" className="h-full w-full object-contain" />
+            <Boxes className="h-full w-full text-primary" strokeWidth={1.5} />
           </div>
-          <img src={diprolamLogo} alt="Diprolam Bjx" className="h-14 object-contain brightness-0 invert" />
+          <h1 className="text-4xl font-bold tracking-tight">InventaPro</h1>
           <div className="text-sm text-sidebar-foreground/70 tracking-wide uppercase font-bold">
-            Sistema de inventario
+            Plataforma de inventario
           </div>
         </div>
         <div className="absolute bottom-6 text-[11px] text-sidebar-foreground/40">
-          © {new Date().getFullYear()} Diprolam Bjx
+          © {new Date().getFullYear()} InventaPro
         </div>
       </div>
 
-      {/* Formulario */}
       <div className="flex items-center justify-center p-6 lg:p-12 bg-background">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex flex-col items-center gap-3 mb-8">
             <div className="h-16 w-16 rounded-xl bg-sidebar flex items-center justify-center p-2">
-              <img src={diprolamIcon} alt="Diprolam" className="h-full w-full object-contain" />
+              <Boxes className="h-full w-full text-primary" strokeWidth={1.5} />
             </div>
+            <div className="text-xl font-bold">InventaPro</div>
           </div>
 
           <h2 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h2>
