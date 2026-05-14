@@ -78,8 +78,8 @@ export const analizarInventarioIA = createServerFn({ method: "POST" })
         };
       });
 
-      const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-      if (!LOVABLE_API_KEY) return { ok: false, error: "LOVABLE_API_KEY no configurado" };
+      const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+      if (!GEMINI_API_KEY) return { ok: false, error: "GEMINI_API_KEY no configurado" };
 
       const systemPrompt = `Eres un analista experto de inventarios y cadena de suministro. Recibirás el inventario actual y los movimientos de los últimos 90 días. Tu tarea es:
 1. Calcular el consumo diario promedio (salidas_ultimos_90d / 90).
@@ -123,36 +123,36 @@ Incluye TODOS los productos del inventario en el array "productos".`;
 Inventario (JSON):
 ${JSON.stringify(inventarioParaIA)}`;
 
-      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          response_format: { type: "json_object" },
-        }),
-      });
+      const aiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.2,
+            },
+          }),
+        }
+      );
 
       if (!aiRes.ok) {
-        if (aiRes.status === 429) return { ok: false, error: "Límite de uso de IA alcanzado, intenta en unos minutos." };
-        if (aiRes.status === 402) return { ok: false, error: "Créditos de IA agotados. Agrega créditos en Settings → Workspace → Usage." };
+        if (aiRes.status === 429) return { ok: false, error: "Límite de uso de Gemini alcanzado, intenta en unos minutos." };
         const t = await aiRes.text();
-        console.error("[analizarInventarioIA] AI error", aiRes.status, t);
+        console.error("[analizarInventarioIA] Gemini error", aiRes.status, t);
         return { ok: false, error: `Error de IA (${aiRes.status})` };
       }
 
       const aiJson = await aiRes.json();
-      const content: string = aiJson.choices?.[0]?.message?.content ?? "";
+      const content: string =
+        aiJson.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
       let parsed: Omit<AnalisisInventarioResultado, "generado_en">;
       try {
         parsed = JSON.parse(content);
-      } catch (e) {
+      } catch {
         console.error("[analizarInventarioIA] JSON parse error", content);
         return { ok: false, error: "La IA devolvió una respuesta no válida." };
       }
