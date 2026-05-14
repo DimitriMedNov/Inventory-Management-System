@@ -60,6 +60,7 @@ function Inner() {
           return;
         }
       }
+      if (!empresaId) { toast.error("Sin empresa asignada"); return; }
       const { error } = await supabase.from("movimientos_inventario").insert({
         producto_id: form.producto_id,
         tipo: form.tipo as "entrada" | "salida" | "ajuste",
@@ -67,6 +68,7 @@ function Inner() {
         motivo: form.motivo,
         referencia: form.referencia,
         usuario_responsable: user?.id,
+        empresa_id: empresaId,
       });
       if (error) throw error;
       toast.success("Movimiento registrado");

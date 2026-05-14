@@ -79,7 +79,8 @@ function Inner() {
         if (error) throw error;
         toast.success("Producto actualizado");
       } else {
-        const { error } = await supabase.from("productos").insert({ ...(payload as Omit<Producto, "id" | "categorias" | "ubicaciones">), creado_por: user?.id });
+        if (!empresaId) return toast.error("Sin empresa asignada");
+        const { error } = await supabase.from("productos").insert({ ...(payload as Omit<Producto, "id" | "categorias" | "ubicaciones">), creado_por: user?.id, empresa_id: empresaId });
         if (error) throw error;
         toast.success("Producto creado");
       }
