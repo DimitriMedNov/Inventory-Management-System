@@ -37,7 +37,7 @@ function Page() {
 }
 
 function Inner() {
-  const { user } = useAuth();
+  const { user, empresaId } = useAuth();
   const nav = useNavigate();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<{ id: string; nombre: string }[]>([]);

@@ -38,6 +38,7 @@ function UbicacionesPage() {
 }
 
 function Inner() {
+  const { empresaId } = useAuth();
   const [items, setItems] = useState<Ubicacion[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Ubicacion | null>(null);

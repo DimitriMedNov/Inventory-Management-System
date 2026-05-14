@@ -34,7 +34,7 @@ function Page() {
 }
 
 function Inner() {
-  const { user } = useAuth();
+  const { user, empresaId } = useAuth();
   const [movs, setMovs] = useState<Mov[]>([]);
   const [productos, setProductos] = useState<{ id: string; nombre: string; sku: string; stock_actual: number; unidad_medida: string }[]>([]);
   const [open, setOpen] = useState(false);
