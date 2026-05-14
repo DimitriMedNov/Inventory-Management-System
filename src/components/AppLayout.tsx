@@ -54,10 +54,13 @@ const ROLE_ICON: Record<AppRole, typeof ShieldCheck> = {
 };
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { profile, role, signOut } = useAuth();
+  const { profile, role, signOut, empresa } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const empresaNombre = empresa?.nombre ?? "InventaPro";
+  const empresaLogo = empresa?.logo_url ?? null;
 
   const visible = NAV.filter((n) => role && n.roles.includes(role));
   const RoleIcon = role ? ROLE_ICON[role] : ShieldCheck;
