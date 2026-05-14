@@ -2,13 +2,24 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "almacen" | "solicitante";
+export type AppRole = "admin" | "almacen" | "solicitante" | "super_admin";
 
 export interface Profile {
   id: string;
   nombre: string;
   correo: string;
   area: string | null;
+  activo: boolean;
+  empresa_id: string | null;
+}
+
+export interface Empresa {
+  id: string;
+  nombre: string;
+  slug: string;
+  logo_url: string | null;
+  color_primario: string;
+  color_sidebar: string;
   activo: boolean;
 }
 
@@ -17,9 +28,10 @@ interface AuthContextValue {
   user: User | null;
   profile: Profile | null;
   role: AppRole | null;
+  empresa: Empresa | null;
+  empresaId: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, nombre: string, area: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -30,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [empresa, setEmpresa] = useState<Empresa | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadProfileAndRole = async (userId: string) => {
@@ -37,20 +50,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId).order("role").limit(1).maybeSingle(),
     ]);
-    setProfile(prof as Profile | null);
+    const p = prof as Profile | null;
+    setProfile(p);
     setRole((roleRow?.role as AppRole) ?? null);
+
+    if (p?.empresa_id) {
+      const { data: emp } = await supabase.from("empresas").select("*").eq("id", p.empresa_id).maybeSingle();
+      setEmpresa(emp as Empresa | null);
+    } else {
+      setEmpresa(null);
+    }
   };
 
   useEffect(() => {
-    // Set listener BEFORE getSession (rule)
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       if (newSession?.user) {
-        // defer to avoid deadlocks
         setTimeout(() => loadProfileAndRole(newSession.user.id), 0);
       } else {
         setProfile(null);
         setRole(null);
+        setEmpresa(null);
       }
     });
 
@@ -68,19 +88,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
-  const signUp = async (email: string, password: string, nombre: string, area: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: { nombre, area },
-      },
-    });
-    if (error) throw error;
-  };
-
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -91,7 +98,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user ?? null, profile, role, loading, signIn, signUp, signOut, refresh }}
+      value={{
+        session,
+        user: session?.user ?? null,
+        profile,
+        role,
+        empresa,
+        empresaId: profile?.empresa_id ?? null,
+        loading,
+        signIn,
+        signOut,
+        refresh,
+      }}
     >
       {children}
     </AuthContext.Provider>
