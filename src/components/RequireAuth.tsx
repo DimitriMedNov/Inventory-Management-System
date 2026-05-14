@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth, type AppRole } from "@/lib/auth-context";
 import { AppLayout } from "./AppLayout";
-import diprolamIcon from "@/assets/diprolam-icon.png";
+import { Boxes } from "lucide-react";
 
 export function RequireAuth({ children, roles }: { children: ReactNode; roles?: AppRole[] }) {
   const { session, role, loading } = useAuth();
@@ -17,14 +17,14 @@ export function RequireAuth({ children, roles }: { children: ReactNode; roles?: 
       <div className="flex h-screen w-full items-center justify-center bg-sidebar">
         <div className="flex flex-col items-center gap-5">
           <div className="h-20 w-20 rounded-2xl bg-white flex items-center justify-center p-3 shadow-xl animate-pulse">
-            <img src={diprolamIcon} alt="Diprolam" className="h-full w-full object-contain" />
+            <Boxes className="h-full w-full text-primary" strokeWidth={1.5} />
           </div>
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
             <div className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
             <div className="h-2 w-2 rounded-full bg-primary animate-bounce" />
           </div>
-          <div className="text-[11px] text-sidebar-foreground/60 uppercase tracking-[0.2em]">Diprolam Bjx</div>
+          <div className="text-[11px] text-sidebar-foreground/60 uppercase tracking-[0.2em]">InventaPro</div>
         </div>
       </div>
     );
