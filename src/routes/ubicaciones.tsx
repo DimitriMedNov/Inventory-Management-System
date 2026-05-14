@@ -14,6 +14,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
@@ -76,7 +77,8 @@ function Inner() {
         if (error) throw error;
         toast.success("Ubicación actualizada");
       } else {
-        const { error } = await supabase.from("ubicaciones").insert(payload);
+        if (!empresaId) return toast.error("Sin empresa asignada");
+        const { error } = await supabase.from("ubicaciones").insert({ ...payload, empresa_id: empresaId });
         if (error) throw error;
         toast.success("Ubicación creada");
       }

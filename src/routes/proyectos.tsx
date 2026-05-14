@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { Plus, Pencil, Trash2, Briefcase, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
 
@@ -91,7 +92,8 @@ function Inner() {
         if (error) throw error;
         toast.success("Proyecto actualizado");
       } else {
-        const { error } = await supabase.from("proyectos").insert(payload);
+        if (!empresaId) return toast.error("Sin empresa asignada");
+        const { error } = await supabase.from("proyectos").insert({ ...payload, empresa_id: empresaId });
         if (error) throw error;
         toast.success("Proyecto creado");
       }

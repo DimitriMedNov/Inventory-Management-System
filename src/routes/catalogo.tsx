@@ -150,6 +150,7 @@ function Inner() {
     if (!proyectoId) { toast.error("Selecciona un proyecto"); return; }
     if (carritoInvalido) { toast.error("Hay líneas con cantidad inválida o sin stock disponible"); return; }
     try {
+      if (!empresaId) { toast.error("Sin empresa asignada"); return; }
       const { data: sol, error: e1 } = await supabase
         .from("solicitudes")
         .insert({
@@ -157,6 +158,7 @@ function Inner() {
           proyecto_id: proyectoId,
           comentarios_usuario: comentario || null,
           fecha_requerida: fechaRequerida ? new Date(fechaRequerida).toISOString() : null,
+          empresa_id: empresaId,
         })
         .select().single();
       if (e1) throw e1;
