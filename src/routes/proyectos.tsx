@@ -42,6 +42,7 @@ function Page() {
 }
 
 function Inner() {
+  const { empresaId } = useAuth();
   const [items, setItems] = useState<Proyecto[]>([]);
   const [filter, setFilter] = useState<"activos" | "terminados" | "todos">("activos");
   const [open, setOpen] = useState(false);
