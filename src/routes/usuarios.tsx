@@ -44,11 +44,13 @@ const ROLE_LABEL: Record<AppRole, string> = {
   admin: "Administrador",
   almacen: "Encargado de almacén",
   solicitante: "Solicitante",
+  super_admin: "Super administrador",
 };
 const ROLE_ICON: Record<AppRole, typeof ShieldCheck> = {
   admin: ShieldCheck,
   almacen: Boxes,
   solicitante: Wrench,
+  super_admin: ShieldCheck,
 };
 
 function UsuariosPage() {
