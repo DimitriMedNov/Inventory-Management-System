@@ -37,3 +37,6 @@ dist-ssr
 # Variables de entorno
 .env
 .env.local
+
+# Salida de build para Vercel
+.vercel
