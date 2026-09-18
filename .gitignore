@@ -33,3 +33,7 @@ dist-ssr
 
 # Lovable workspace files
 .lovable/
+
+# Variables de entorno
+.env
+.env.local
