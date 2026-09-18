@@ -1,0 +1,47 @@
+# Supabase pausa los proyectos del plan gratis cuando la base pasa unos días sin
+# recibir consultas, y la demo del portafolio se cae sin avisar. Esto le pega a la
+# base cada tres días para que eso no suceda, y falla ruidosamente si algo se rompió.
+name: Mantener viva la demo
+
+on:
+  schedule:
+    - cron: "17 14 */3 * *" # cada 3 días, 14:17 UTC (08:17 en Mérida)
+  workflow_dispatch: # también se puede lanzar a mano desde la pestaña Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar la base de datos
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://ekzmulbsnruluvlpmhlt.supabase.co' }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Falta el secreto SUPABASE_ANON_KEY."
+            echo "Agrégalo en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          codigo=$(curl -s -o /tmp/respuesta.json -w "%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/productos?select=id&limit=1")
+          echo "Respuesta de Supabase: $codigo"
+          if [ "$codigo" != "200" ]; then
+            echo "La base no respondió como se esperaba. Contenido:"
+            cat /tmp/respuesta.json
+            exit 1
+          fi
+          echo "La base está despierta."
+
+      - name: Revisar que la demo cargue
+        env:
+          DEMO_URL: ${{ vars.DEMO_URL || 'https://inventory-management-system-ten-puce.vercel.app' }}
+        run: |
+          codigo=$(curl -s -o /dev/null -w "%{http_code}" -L "$DEMO_URL/login")
+          echo "Respuesta de la demo: $codigo"
+          if [ "$codigo" != "200" ]; then
+            echo "La demo no está respondiendo."
+            exit 1
+          fi
+          echo "La demo está en línea."
