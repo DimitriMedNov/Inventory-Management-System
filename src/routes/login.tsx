@@ -11,12 +11,35 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
+/**
+ * Cuenta de demostración. Se configura con variables de entorno
+ * (VITE_DEMO_EMAIL y VITE_DEMO_PASSWORD) para no dejar credenciales en el código.
+ * Si no están definidas, el botón de invitado simplemente no aparece.
+ */
+const demoEmail = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
+const demoPassword = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
+const hasDemo = Boolean(demoEmail && demoPassword);
+
 function LoginPage() {
   const { session, signIn, loading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const enterAsGuest = async () => {
+    if (!hasDemo) return;
+    setBusy(true);
+    try {
+      await signIn(demoEmail as string, demoPassword as string);
+      toast.success("Entraste como invitado");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/dashboard" });
@@ -81,6 +104,23 @@ function LoginPage() {
               {busy ? "Procesando..." : "Entrar"}
             </Button>
           </form>
+
+          {hasDemo && (
+            <>
+              <div className="flex items-center gap-3 my-6">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted-foreground">o</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <Button type="button" variant="outline" className="w-full" onClick={enterAsGuest} disabled={busy}>
+                Entrar como invitado
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Cuenta de demostración con datos de ejemplo. Puede ver el inventario y
+                levantar requisiciones, pero no autorizarlas ni modificar el catálogo.
+              </p>
+            </>
+          )}
 
           <div className="text-center mt-6 text-xs text-muted-foreground">
             Acceso restringido. Si no tienes cuenta, contacta al administrador.

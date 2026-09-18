@@ -47,3 +47,15 @@ npm run dev
 - Weighted-average cost per product
 - Purchase orders linked to requisitions
 - Tests for the movements ledger and the role policies
+
+## Demo account
+
+The login screen shows an **Entrar como invitado** button when `VITE_DEMO_EMAIL` and
+`VITE_DEMO_PASSWORD` are set, so anyone can walk through the system without asking for
+access. The guest holds the `solicitante` role only: it can browse inventory and file a
+requisition, but it cannot authorize one or edit the catalog — enforced by Row Level
+Security, not by hiding buttons.
+
+`supabase/seed-demo.sql` loads the sample data behind it: 20 products across 5 categories
+and 3 locations, 27 stock movements over the last three months, 4 projects and 5
+requisitions covering every status. All of it invented — no real company data.
