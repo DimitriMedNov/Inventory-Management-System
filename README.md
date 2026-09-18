@@ -52,9 +52,9 @@ npm run dev
 
 The login screen shows an **Entrar como invitado** button when `VITE_DEMO_EMAIL` and
 `VITE_DEMO_PASSWORD` are set, so anyone can walk through the system without asking for
-access. The guest holds the `solicitante` role only: it can browse inventory and file a
-requisition, but it cannot authorize one or edit the catalog — enforced by Row Level
-Security, not by hiding buttons.
+access. The guest signs in as an `admin` of the demo company, so the whole system is visible:
+catalog, stock movements, requisition approval and user management. Access is scoped to
+that company by Row Level Security, so the account cannot reach any other tenant's data.
 
 `supabase/seed-demo.sql` loads the sample data behind it: 20 products across 5 categories
 and 3 locations, 27 stock movements over the last three months, 4 projects and 5

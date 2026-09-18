@@ -29,14 +29,17 @@ BEGIN
   ON CONFLICT (slug) DO UPDATE SET nombre = EXCLUDED.nombre
   RETURNING id INTO v_emp;
 
-  -- Perfil y rol del usuario de demostración (solo solicitante: puede ver y pedir, no aprobar)
+  -- Perfil y rol del usuario de demostración (admin: la demo enseña el sistema completo)
+  -- empresa_id va en el UPDATE también: si Supabase ya creó el perfil al dar de alta
+  -- al usuario, viene sin empresa y sin eso el usuario no ve absolutamente nada.
   INSERT INTO public.profiles (id, nombre, correo, area, empresa_id)
   VALUES (v_demo, 'Usuario de demostración', 'demo@inventapro.mx', 'Visitantes', v_emp)
-  ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre, area = EXCLUDED.area;
+  ON CONFLICT (id) DO UPDATE
+    SET nombre = EXCLUDED.nombre, area = EXCLUDED.area, empresa_id = EXCLUDED.empresa_id;
 
   INSERT INTO public.user_roles (user_id, role, empresa_id)
-  VALUES (v_demo, 'solicitante', v_emp)
-  ON CONFLICT (user_id, role) DO NOTHING;
+  VALUES (v_demo, 'admin', v_emp)
+  ON CONFLICT (user_id, role) DO UPDATE SET empresa_id = EXCLUDED.empresa_id;
 
   -- Catálogos
   INSERT INTO public.categorias (nombre, descripcion, empresa_id) VALUES
